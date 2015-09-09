@@ -1,0 +1,15 @@
+﻿@using FSPOC2.Models;
+@model List<Application>
+@{
+    ViewBag.Title = "FSPOC 2.0";
+}
+
+<h2>Apps</h2>
+<ul>
+    @foreach(Application app in Model)
+    {
+        <li>@Html.ActionLink(app.Name, "Index", "DBManager", new { @appName = app.Name }, null)</li>
+    }
+</ul>
+
+@Html.ActionLink("Create new Application", "Create")

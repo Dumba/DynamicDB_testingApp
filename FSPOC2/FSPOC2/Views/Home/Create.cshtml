@@ -1,0 +1,38 @@
+﻿@using FSPOC2.Models
+@model Application
+@{
+    ViewBag.Title = "Create";
+    ViewBag.JS =
+        "$(document).ready(function () {" +
+        "  $('input[name=_Name]').on('keyup change', function () {" +
+        "    var prefix = $('input[name=_DbTablePrefix]');" +
+        "    if (prefix.val().indexOf('Dynamic_') == 0)" +
+        "      prefix.val('Dynamic_' + this.value);" +
+
+        "    var meta = $('input[name=_DbMetaTables]');" +
+        "    if (meta.val().indexOf('Dynamic_') == 0)" +
+        "      meta.val('Dynamic_' + this.value + '_Metadata_tables');" +
+        "  });" +
+        "});";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm("Create"))
+{
+    <table>
+        <tr>
+            <th>Name:</th>
+            <td>@Html.TextBoxFor(app => app._Name)</td>
+        </tr>
+        <tr>
+            <th>Database tables prefix</th>
+            <td>@Html.TextBoxFor(app => app._DbTablePrefix)</td>
+        </tr>
+        <tr>
+            <th>Database table for metadata</th>
+            <td>@Html.TextBoxFor(app => app._DbMetaTables)</td>
+        </tr>
+    </table>
+    <button>Create</button>
+}

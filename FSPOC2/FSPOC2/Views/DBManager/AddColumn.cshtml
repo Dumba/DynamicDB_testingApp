@@ -1,0 +1,35 @@
+﻿@using FSPOC2.Models;
+@model DBItems_Metadata_column
+@{
+    ViewBag.Title = "AddColumn";
+}
+
+<h2>Add Column</h2>
+
+@using (Html.BeginForm("AddColumn", "DBManager"))
+{
+    <table>
+        <tr>
+            <th>Name:</th>
+            <td>@Html.TextBoxFor(m => m.Name)</td>
+        </tr>
+        <tr>
+            <th>Data Type:</th>
+            <td>
+                <select name="type">
+                    @foreach (DBItems_Metadata_datatypes type in (new Entities()).DBItems_Metadata_datatypes)
+                    {
+                        <option value="@type.Id">@type.Name</option>
+                    }
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>Maximum length: </th>
+            <td>@Html.TextBoxFor(m => m.MaxLength)</td>
+        </tr>
+    </table>
+
+    <button>Add</button>
+    @Html.ActionLink("Back", "Details", new { @id = Model.ItemId })
+}

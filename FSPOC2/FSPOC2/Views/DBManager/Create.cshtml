@@ -1,0 +1,46 @@
+﻿@using DynamicDB
+@using System.Data
+@model DBTable
+@{
+    ViewBag.Title = "Create";
+    var types = Enum.GetValues(typeof(SqlDbType));
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm("Create", "DBManager", new { @appName = Request["appName"] }, FormMethod.Post, null))
+{
+    <table>
+        <tr>
+            <th>Name: </th>
+            <td>@Html.TextBox("tableName")</td>
+        </tr>
+        <tr>
+            <th>New column: </th>
+            <td>@Html.TextBox("column1")</td>
+            <td>
+                <select name="column1_type">
+                    @foreach(SqlDbType type in types)
+                    {
+                        <option value="@((int)type)">@(type.ToString())</option>
+                    }
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>New column: </th>
+            <td>@Html.TextBox("column2")</td>
+            <td>
+                <select name="column2_type">
+                    @foreach (SqlDbType type in types)
+                    {
+                        <option value="@((int)type)">@(type.ToString())</option>
+                    }
+                </select>
+            </td>
+        </tr>
+    </table>
+
+    <button>Create</button>
+    @Html.ActionLink("Back", "Index")
+}

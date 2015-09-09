@@ -1,0 +1,415 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="__MigrationHistory">
+          <Key>
+            <PropertyRef Name="MigrationId" />
+            <PropertyRef Name="ContextKey" />
+          </Key>
+          <Property Name="MigrationId" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="ContextKey" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="Model" Type="varbinary(max)" Nullable="false" />
+          <Property Name="ProductVersion" Type="nvarchar" MaxLength="32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Activities">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Type" Type="int" Nullable="false" />
+          <Property Name="PositionX" Type="int" Nullable="false" />
+          <Property Name="PositionY" Type="int" Nullable="false" />
+          <Property Name="Commit_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Applications">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="DbTablePrefix" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="DbMetaTables" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Commits">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CommitMessage" Type="nvarchar(max)" />
+          <Property Name="Timestamp" Type="datetime" Nullable="false" />
+          <Property Name="Workflow_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Inputs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Source" Type="int" Nullable="false" />
+          <Property Name="Slot" Type="int" Nullable="false" />
+          <Property Name="Activity_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Outputs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Target" Type="int" Nullable="false" />
+          <Property Name="SourceSlot" Type="int" Nullable="false" />
+          <Property Name="TargetSlot" Type="int" Nullable="false" />
+          <Property Name="Activity_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Workflows">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" />
+          <Property Name="CreationTime" Type="datetime" Nullable="false" />
+          <Property Name="LastChangeTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_dbo_Activities_dbo_Commits_Commit_Id">
+          <End Role="Commits" Type="Self.Commits" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Activities" Type="Self.Activities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Commits">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Activities">
+              <PropertyRef Name="Commit_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Commits_dbo_Workflows_Workflow_Id">
+          <End Role="Workflows" Type="Self.Workflows" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Commits" Type="Self.Commits" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Workflows">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Commits">
+              <PropertyRef Name="Workflow_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Inputs_dbo_Activities_Activity_Id">
+          <End Role="Activities" Type="Self.Activities" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Inputs" Type="Self.Inputs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Activities">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Inputs">
+              <PropertyRef Name="Activity_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Outputs_dbo_Activities_Activity_Id">
+          <End Role="Activities" Type="Self.Activities" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Outputs" Type="Self.Outputs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Activities">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Outputs">
+              <PropertyRef Name="Activity_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ModelStoreContainer">
+          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Activities" EntityType="Self.Activities" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Applications" EntityType="Self.Applications" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Commits" EntityType="Self.Commits" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Inputs" EntityType="Self.Inputs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Outputs" EntityType="Self.Outputs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Workflows" EntityType="Self.Workflows" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_dbo_Activities_dbo_Commits_Commit_Id" Association="Self.FK_dbo_Activities_dbo_Commits_Commit_Id">
+            <End Role="Commits" EntitySet="Commits" />
+            <End Role="Activities" EntitySet="Activities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Commits_dbo_Workflows_Workflow_Id" Association="Self.FK_dbo_Commits_dbo_Workflows_Workflow_Id">
+            <End Role="Workflows" EntitySet="Workflows" />
+            <End Role="Commits" EntitySet="Commits" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Inputs_dbo_Activities_Activity_Id" Association="Self.FK_dbo_Inputs_dbo_Activities_Activity_Id">
+            <End Role="Activities" EntitySet="Activities" />
+            <End Role="Inputs" EntitySet="Inputs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Outputs_dbo_Activities_Activity_Id" Association="Self.FK_dbo_Outputs_dbo_Activities_Activity_Id">
+            <End Role="Activities" EntitySet="Activities" />
+            <End Role="Outputs" EntitySet="Outputs" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="C__MigrationHistory">
+          <Key>
+            <PropertyRef Name="MigrationId" />
+            <PropertyRef Name="ContextKey" />
+          </Key>
+          <Property Name="MigrationId" Type="String" MaxLength="150" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ContextKey" Type="String" MaxLength="300" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Model" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
+          <Property Name="ProductVersion" Type="String" MaxLength="32" FixedLength="false" Unicode="true" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Activity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Type" Type="Int32" Nullable="false" />
+          <Property Name="PositionX" Type="Int32" Nullable="false" />
+          <Property Name="PositionY" Type="Int32" Nullable="false" />
+          <Property Name="Commit_Id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Commit" Relationship="Self.FK_dbo_Activities_dbo_Commits_Commit_Id" FromRole="Activities" ToRole="Commits" />
+          <NavigationProperty Name="Inputs" Relationship="Self.FK_dbo_Inputs_dbo_Activities_Activity_Id" FromRole="Activities" ToRole="Inputs" />
+          <NavigationProperty Name="Outputs" Relationship="Self.FK_dbo_Outputs_dbo_Activities_Activity_Id" FromRole="Activities" ToRole="Outputs" />
+        </EntityType>
+        <EntityType Name="Commit">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CommitMessage" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Workflow_Id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Activities" Relationship="Self.FK_dbo_Activities_dbo_Commits_Commit_Id" FromRole="Commits" ToRole="Activities" />
+          <NavigationProperty Name="Workflow" Relationship="Self.FK_dbo_Commits_dbo_Workflows_Workflow_Id" FromRole="Commits" ToRole="Workflows" />
+        </EntityType>
+        <EntityType Name="Input">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Source" Type="Int32" Nullable="false" />
+          <Property Name="Slot" Type="Int32" Nullable="false" />
+          <Property Name="Activity_Id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Activity" Relationship="Self.FK_dbo_Inputs_dbo_Activities_Activity_Id" FromRole="Inputs" ToRole="Activities" />
+        </EntityType>
+        <EntityType Name="Output">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Target" Type="Int32" Nullable="false" />
+          <Property Name="SourceSlot" Type="Int32" Nullable="false" />
+          <Property Name="TargetSlot" Type="Int32" Nullable="false" />
+          <Property Name="Activity_Id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Activity" Relationship="Self.FK_dbo_Outputs_dbo_Activities_Activity_Id" FromRole="Outputs" ToRole="Activities" />
+        </EntityType>
+        <EntityType Name="Workflow">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreationTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="LastChangeTime" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Commits" Relationship="Self.FK_dbo_Commits_dbo_Workflows_Workflow_Id" FromRole="Workflows" ToRole="Commits" />
+        </EntityType>
+        <Association Name="FK_dbo_Activities_dbo_Commits_Commit_Id">
+          <End Role="Commits" Type="Self.Commit" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Activities" Type="Self.Activity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Commits">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Activities">
+              <PropertyRef Name="Commit_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Inputs_dbo_Activities_Activity_Id">
+          <End Role="Activities" Type="Self.Activity" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Inputs" Type="Self.Input" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Activities">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Inputs">
+              <PropertyRef Name="Activity_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Outputs_dbo_Activities_Activity_Id">
+          <End Role="Activities" Type="Self.Activity" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Outputs" Type="Self.Output" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Activities">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Outputs">
+              <PropertyRef Name="Activity_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_Commits_dbo_Workflows_Workflow_Id">
+          <End Role="Workflows" Type="Self.Workflow" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Commits" Type="Self.Commit" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Workflows">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Commits">
+              <PropertyRef Name="Workflow_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="C__MigrationHistory" EntityType="Self.C__MigrationHistory" />
+          <EntitySet Name="Activities" EntityType="Self.Activity" />
+          <EntitySet Name="Commits" EntityType="Self.Commit" />
+          <EntitySet Name="Inputs" EntityType="Self.Input" />
+          <EntitySet Name="Outputs" EntityType="Self.Output" />
+          <EntitySet Name="Workflows" EntityType="Self.Workflow" />
+          <AssociationSet Name="FK_dbo_Activities_dbo_Commits_Commit_Id" Association="Self.FK_dbo_Activities_dbo_Commits_Commit_Id">
+            <End Role="Commits" EntitySet="Commits" />
+            <End Role="Activities" EntitySet="Activities" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Inputs_dbo_Activities_Activity_Id" Association="Self.FK_dbo_Inputs_dbo_Activities_Activity_Id">
+            <End Role="Activities" EntitySet="Activities" />
+            <End Role="Inputs" EntitySet="Inputs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Outputs_dbo_Activities_Activity_Id" Association="Self.FK_dbo_Outputs_dbo_Activities_Activity_Id">
+            <End Role="Activities" EntitySet="Activities" />
+            <End Role="Outputs" EntitySet="Outputs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_Commits_dbo_Workflows_Workflow_Id" Association="Self.FK_dbo_Commits_dbo_Workflows_Workflow_Id">
+            <End Role="Workflows" EntitySet="Workflows" />
+            <End Role="Commits" EntitySet="Commits" />
+          </AssociationSet>
+          <EntitySet Name="Applications" EntityType="Model.Application" />
+          </EntityContainer>
+        <EntityType Name="Application">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DbTablePrefix" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DbMetaTables" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ModelStoreContainer" CdmEntityContainer="Entities">
+          <EntitySetMapping Name="C__MigrationHistory">
+            <EntityTypeMapping TypeName="Model.C__MigrationHistory">
+              <MappingFragment StoreEntitySet="__MigrationHistory">
+                <ScalarProperty Name="MigrationId" ColumnName="MigrationId" />
+                <ScalarProperty Name="ContextKey" ColumnName="ContextKey" />
+                <ScalarProperty Name="Model" ColumnName="Model" />
+                <ScalarProperty Name="ProductVersion" ColumnName="ProductVersion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Activities">
+            <EntityTypeMapping TypeName="Model.Activity">
+              <MappingFragment StoreEntitySet="Activities">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="PositionX" ColumnName="PositionX" />
+                <ScalarProperty Name="PositionY" ColumnName="PositionY" />
+                <ScalarProperty Name="Commit_Id" ColumnName="Commit_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Commits">
+            <EntityTypeMapping TypeName="Model.Commit">
+              <MappingFragment StoreEntitySet="Commits">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="CommitMessage" ColumnName="CommitMessage" />
+                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+                <ScalarProperty Name="Workflow_Id" ColumnName="Workflow_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Inputs">
+            <EntityTypeMapping TypeName="Model.Input">
+              <MappingFragment StoreEntitySet="Inputs">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Source" ColumnName="Source" />
+                <ScalarProperty Name="Slot" ColumnName="Slot" />
+                <ScalarProperty Name="Activity_Id" ColumnName="Activity_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Outputs">
+            <EntityTypeMapping TypeName="Model.Output">
+              <MappingFragment StoreEntitySet="Outputs">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Target" ColumnName="Target" />
+                <ScalarProperty Name="SourceSlot" ColumnName="SourceSlot" />
+                <ScalarProperty Name="TargetSlot" ColumnName="TargetSlot" />
+                <ScalarProperty Name="Activity_Id" ColumnName="Activity_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Workflows">
+            <EntityTypeMapping TypeName="Model.Workflow">
+              <MappingFragment StoreEntitySet="Workflows">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="CreationTime" ColumnName="CreationTime" />
+                <ScalarProperty Name="LastChangeTime" ColumnName="LastChangeTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Applications">
+            <EntityTypeMapping TypeName="Model.Application">
+              <MappingFragment StoreEntitySet="Applications">
+                <ScalarProperty Name="DbMetaTables" ColumnName="DbMetaTables" />
+                <ScalarProperty Name="DbTablePrefix" ColumnName="DbTablePrefix" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
