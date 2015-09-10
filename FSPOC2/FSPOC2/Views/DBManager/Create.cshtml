@@ -5,42 +5,99 @@
     ViewBag.Title = "Create";
     var types = Enum.GetValues(typeof(SqlDbType));
 }
+<script>
+    $(document).ready(function () {
+        $('#btnAddColumn').click(function () {
+            $('#newColumn').attr('data-id', $('#newColumn').attr('data-id') - (-1));
+            var current_id = $('#newColumn').attr('data-id');
+            alert($('#newColumn').attr('data-id'));
+            //var currentRows = $('#newColumn tr').size();
+            var options = $('#newColumn select').first().html();
+            $('#newColumn').append('<tr data-id="'+ current_id +'"><td><input type="text" name="columnName' + current_id + '"></td>' +
+                '<td><select name="column'+current_id+'_type"> ' + options +'</td>'+
+                '<td><input type="text" name="columnMaxLength' + current_id + '"></td>' +
+                '<td><input type="checkbox" name="columnUnique' + current_id + '"></td>' +
+                '<td><input type="checkbox" name="columnNullable' + current_id + '"></td>' +
+                '<td><input type="checkbox" name="columnPrimaryKey' + current_id + '"></td>' +
+                '<td><input type="checkbox" name="columnIdentity' + current_id + '"></td>' +
+                '<td><input type="text" name="columnDefVal' + current_id + '"></td>' +
+                '<td><input type="checkbox" name="columnIndex' + current_id + '"></td>' +
+                '<td><button data-id="'+ current_id +'" class="btn btn-danger btnRemoveColumn">Remove</button</td>' +
 
+
+                '</tr>');
+            return false;
+        });
+
+        $(document).on('click', '.btnRemoveColumn', function () {
+            if ($('#newColumn tr').size() == 2)
+            {
+                return false;
+            }
+       
+            var id = ($(this).attr('data-id'));
+            $('tr[data-id="' + id +'"]').remove();
+            return false;
+        });
+
+    });
+</script>
 <h2>Create</h2>
 
 @using (Html.BeginForm("Create", "DBManager", new { @appName = Request["appName"] }, FormMethod.Post, null))
 {
-    <table>
-        <tr>
-            <th>Name: </th>
-            <td>@Html.TextBox("tableName")</td>
-        </tr>
-        <tr>
-            <th>New column: </th>
-            <td>@Html.TextBox("column1")</td>
-            <td>
-                <select name="column1_type">
-                    @foreach(SqlDbType type in types)
-                    {
-                        <option value="@((int)type)">@(type.ToString())</option>
-                    }
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th>New column: </th>
-            <td>@Html.TextBox("column2")</td>
-            <td>
-                <select name="column2_type">
-                    @foreach (SqlDbType type in types)
-                    {
-                        <option value="@((int)type)">@(type.ToString())</option>
-                    }
-                </select>
-            </td>
-        </tr>
-    </table>
+   
+            <table class="table table-bordered">
+                <tr>
+                    <th>Name: </th>
+                    <td>@Html.TextBox("tableName")</td>
+                </tr>
+                <tr>
+                    <th>New column: </th>
+                    <td>
+                        <table data-id="1" id="newColumn" class="table table-responsive table-bordered table-striped">
+                            <tr>
+                                <th>Column Name:</th>
+                                <th>Data Type:</th>
+                                <th>Max Length:</th>
+                                <th>Unique:</th>
+                                <th>Nullable:</th>
+                                <th>Primary Key:</th>
+                                <th>Identity:</th>
+                                <th>Default Value:</th>
+                                <th>Index:</th>
+                                <th>Remove:</th>
+                            </tr>
+                            <tr data-id="1">
+                                <td>@Html.TextBox("columnName1")</td>
+                                <td>
+                                    <select name="column1_type">
+                                        @foreach (SqlDbType type in types)
+                                        {
+                                            <option value="@((int)type)">@(type.ToString())</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>@Html.TextBox("columnMaxLength1")</td>
+                                <td>@Html.CheckBox("columnUnique1")</td>
+                                <td>@Html.CheckBox("columnNullable1")</td>
+                                <td>@Html.CheckBox("columnPrimaryKey1")</td>
+                                <td>@Html.CheckBox("columnIdentity1")</td>
+                                <td>@Html.TextBox("columnDefVal1")</td>
+                                <td>@Html.CheckBox("columnIndex1")</td>
+                                <td><button data-id="1" class="btn btn-danger btnRemoveColumn">Remove</button></td>
+                            </tr>
+                        </table>
+                    </td>
 
-    <button>Create</button>
-    @Html.ActionLink("Back", "Index")
+                </tr>
+                <tr>
+                    <td>Actions:</td>
+                    <td><button id="btnAddColumn" class="btn btn-success">Add Column</button></td>
+                </tr>
+            </table>
+
+            <button>Create</button>
+            @Html.ActionLink("Back", "Index")
+      
 }
