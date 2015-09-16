@@ -1,5 +1,5 @@
-﻿@using FSPOC2.Models;
-@model DBItems_Metadata_tables
+﻿@using DynamicDB;
+@model DBTable
 @{
     ViewBag.Title = "Details";
 }
@@ -9,13 +9,15 @@
 <table>
     <tr>
         <th>Name</th>
-        <td>@Model.Name</td>
+        <td>@Model.tableName</td>
     </tr>
-    <tr>
-        <th>Columns:</th>
-        <td>@string.Join(", ", Model.DBItems_Metadata_columns.Select(c => c.Name))</td>
-        <td>@Html.ActionLink("Add new", "AddColumn", new { @id = Model.Id })</td>
-    </tr>
+    @foreach(DBColumn column in Model.getColumnList())
+    {
+        <tr>
+            <th>Column</th>
+            <td>@column.Name</td>
+        </tr>
+    }
 </table>
 
-@Html.ActionLink("back", "Index")
+@Html.ActionLink("back", "Index", new { @appName = Request["appName"] })

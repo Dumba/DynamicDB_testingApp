@@ -25,7 +25,7 @@ namespace FSPOC2.Controllers
 
             DBTable table = DBTable.GetTable(id);
 
-            return View();
+            return View(table);
         }
         public ActionResult Data(string appName, string id)
         {
@@ -53,7 +53,7 @@ namespace FSPOC2.Controllers
                 DBTable.SaveChanges();
                 
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { @appName = appName });
             }
 
             return View();
