@@ -1,0 +1,28 @@
+﻿@using DynamicDB
+@model DynamicDB.DBTable
+@{
+    ViewBag.Title = "Data";
+}
+
+<h2>Data</h2>
+
+<table>
+    <thead>
+        @foreach (DBColumn c in @Model.getColumnList())
+        {
+            <th>@c.Name</th>
+        }
+    </thead>
+    <tbody>
+        @foreach (DBItem i in @Model.Select().ToList())
+        {
+            <tr>
+                @foreach (DBColumn co in @Model.getColumnList())
+                    {
+                    <td>@i[co.Name]</td>
+                    }
+            </tr>
+        }
+    </tbody>
+</table>
+

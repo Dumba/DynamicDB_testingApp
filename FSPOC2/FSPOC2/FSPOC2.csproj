@@ -46,7 +46,7 @@
   <ItemGroup>
     <Reference Include="DynamicDB, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\DynamicDB.dll</HintPath>
+      <HintPath>..\..\..\DynamicDB\bin\Debug\DynamicDB.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
@@ -298,6 +298,7 @@
     <Content Include="Views\DBManager\Create.cshtml" />
     <Content Include="Views\DBManager\AddColumn.cshtml" />
     <Content Include="Views\Home\Create.cshtml" />
+    <Content Include="Views\DBManager\Data.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

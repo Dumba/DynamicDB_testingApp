@@ -12,6 +12,7 @@ namespace FSPOC2.Controllers
     {
         public ActionResult Index(string appName)
         {
+            ViewBag.appName = appName;
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             List<DBTable> tables = DBTable.GetAll();
@@ -29,9 +30,11 @@ namespace FSPOC2.Controllers
         }
         public ActionResult Data(string appName, string id)
         {
-            Entities e = new Entities();
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
-            return View();
+            DBTable table = DBTable.GetTable(id);
+            return View(table);
         }
 
         public ActionResult Create(string appName)
