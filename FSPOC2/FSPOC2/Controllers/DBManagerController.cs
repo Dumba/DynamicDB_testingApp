@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -34,6 +35,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(id);
+            ViewBag.TableName = table.tableName;
             return View(table);
         }
 
@@ -44,7 +46,7 @@ namespace FSPOC2.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Create(string appName, string tableName)
+        public ActionResult Create(string appName, string tableName, DBTable model)
         {
             if (!string.IsNullOrWhiteSpace(tableName))
             {
@@ -52,9 +54,13 @@ namespace FSPOC2.Controllers
                 DBTable.ApplicationName = appName;
 
                 DBTable table = DBTable.Create(tableName);
-                table.AddColumn("Id", System.Data.SqlDbType.Int, canBeNull: false);
-                DBTable.SaveChanges();
+               
+                foreach (DBColumn c in model._columns)
+                {
+                    table.AddColumn(c.Name, c.type, c.maxLength, c.canBeNull);
+                }
                 
+                DBTable.SaveChanges();
 
                 return RedirectToAction("Index", new { @appName = appName });
             }

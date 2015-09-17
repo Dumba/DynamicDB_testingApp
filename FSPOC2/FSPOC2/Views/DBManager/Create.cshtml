@@ -7,55 +7,58 @@
 }
 <script>
     $(document).ready(function () {
+        function reindex($row, newId) {
+            $row.find('input, select').each(function() {
+                this.name = this.name.replace(/\[[0-9]+\]/, '[' + newId + ']');
+            });
+            $row.attr('data-id', newId);
+        }
+        function reindexAll() {
+            $('#newColumn tr[data-id]').each(function (index) {
+                reindex($(this), index);
+            });
+        }
+
         $('#btnAddColumn').click(function () {
-            $('#newColumn').attr('data-id', $('#newColumn').attr('data-id') - (-1));
-            var current_id = $('#newColumn').attr('data-id');
-            alert($('#newColumn').attr('data-id'));
-            //var currentRows = $('#newColumn tr').size();
-            var options = $('#newColumn select').first().html();
-            $('#newColumn').append('<tr data-id="'+ current_id +'"><td><input type="text" name="columnName' + current_id + '"></td>' +
-                '<td><select name="column'+current_id+'_type"> ' + options +'</td>'+
-                '<td><input type="text" name="columnMaxLength' + current_id + '"></td>' +
-                '<td><input type="checkbox" name="columnUnique' + current_id + '"></td>' +
-                '<td><input type="checkbox" name="columnNullable' + current_id + '"></td>' +
-                '<td><input type="checkbox" name="columnPrimaryKey' + current_id + '"></td>' +
-                '<td><input type="checkbox" name="columnIdentity' + current_id + '"></td>' +
-                '<td><input type="text" name="columnDefVal' + current_id + '"></td>' +
-                '<td><input type="checkbox" name="columnIndex' + current_id + '"></td>' +
-                '<td><button data-id="'+ current_id +'" class="btn btn-danger btnRemoveColumn">Remove</button</td>' +
+            var $table = $('#newColumn');
+            var columnCount = $table.find('tr[data-id]').length;
+            var nextId = columnCount; // index začíná 0
 
+            alert(nextId);
 
-                '</tr>');
+            var $newRow = $('#ColumnTemplate').clone();
+            reindex($newRow, nextId);
+            $newRow.find('input, select').attr('disabled', false);
+            $newRow.removeAttr('id style');
+            $table.append($newRow);
             return false;
         });
 
         $(document).on('click', '.btnRemoveColumn', function () {
-            if ($('#newColumn tr').size() == 2)
-            {
-                return false;
-            }
-       
-            var id = ($(this).attr('data-id'));
-            $('tr[data-id="' + id +'"]').remove();
+            $(this).parents('tr').eq(0).remove();
+            reindexAll();
             return false;
         });
 
+        $('#btnAddColumn').click();
     });
 </script>
 <h2>Create</h2>
 
 @using (Html.BeginForm("Create", "DBManager", new { @appName = Request["appName"] }, FormMethod.Post, null))
 {
-   
-            <table class="table table-bordered">
-                <tr>
-                    <th>Name: </th>
-                    <td>@Html.TextBox("tableName")</td>
-                </tr>
-                <tr>
-                    <th>New column: </th>
-                    <td>
-                        <table data-id="1" id="newColumn" class="table table-responsive table-bordered table-striped">
+
+    <table class="table table-bordered" id="mytable">
+        
+            <tr>
+                <th>Name: </th>
+                <td>@Html.TextBoxFor(x=>x.tableName,"tableName")</td>
+            </tr>
+            <tr>
+                <th>New column: </th>
+                <td>
+                    <table id="newColumn" class="table table-responsive table-bordered table-striped">
+                        <tbody>
                             <tr>
                                 <th>Column Name:</th>
                                 <th>Data Type:</th>
@@ -63,41 +66,43 @@
                                 <th>Unique:</th>
                                 <th>Nullable:</th>
                                 <th>Primary Key:</th>
-                                <th>Identity:</th>
+                                @*<th>Identity:</th>
                                 <th>Default Value:</th>
-                                <th>Index:</th>
+                                <th>Index:</th>*@
                                 <th>Remove:</th>
                             </tr>
-                            <tr data-id="1">
-                                <td>@Html.TextBox("columnName1")</td>
+                            <tr id="ColumnTemplate" style="display: none">
+                                <td>@Html.TextBoxFor(x=>x._columns[0].Name, new {@disabled=true})</td>
                                 <td>
-                                    <select name="column1_type">
+                                    <select name="_columns[0].Type" disabled="True">
                                         @foreach (SqlDbType type in types)
                                         {
-                                            <option value="@((int)type)">@(type.ToString())</option>
+                                            <option value="@((int) type)">@(type.ToString())</option>
                                         }
                                     </select>
                                 </td>
-                                <td>@Html.TextBox("columnMaxLength1")</td>
-                                <td>@Html.CheckBox("columnUnique1")</td>
-                                <td>@Html.CheckBox("columnNullable1")</td>
-                                <td>@Html.CheckBox("columnPrimaryKey1")</td>
-                                <td>@Html.CheckBox("columnIdentity1")</td>
-                                <td>@Html.TextBox("columnDefVal1")</td>
-                                <td>@Html.CheckBox("columnIndex1")</td>
-                                <td><button data-id="1" class="btn btn-danger btnRemoveColumn">Remove</button></td>
+                                <td>@Html.TextBoxFor(x => x._columns[0].maxLength, new { @disabled = true })</td>
+                                <td>@Html.CheckBoxFor(x => x._columns[0].isUnique, new { @disabled = true })</td>
+                                <td>@Html.CheckBoxFor(x => x._columns[0].canBeNull, new { @disabled = true })</td>
+                                <td>@Html.CheckBoxFor(x => x._columns[0].isPrimaryKey, new { @disabled = true })</td>
+                                @*<td>@Html.CheckBox("columnIdentity1", new {@disabled=true})</td>
+    <td>@Html.TextBox("columnDefVal1", new {@disabled=true})</td>
+    <td>@Html.CheckBox("columnIndex1", new {@disabled=true})</td>*@
+                                <td><button class="btn btn-danger btnRemoveColumn">Remove</button></td>
                             </tr>
-                        </table>
-                    </td>
+                        </tbody>
+                    </table>
+                </td>
 
-                </tr>
-                <tr>
-                    <td>Actions:</td>
-                    <td><button id="btnAddColumn" class="btn btn-success">Add Column</button></td>
-                </tr>
-            </table>
+            </tr>
+            <tr>
+                <td>Actions:</td>
+                <td><button id="btnAddColumn" class="btn btn-success">Add Column</button></td>
+            </tr>
+        
+    </table>
 
-            <button>Create</button>
+            <button type="submit">Create</button>
             @Html.ActionLink("Back", "Index", new { @appName = ViewBag.appName })
       
 }
