@@ -20,21 +20,21 @@ namespace FSPOC2.Controllers
 
             return View(tables);
         }
-        public ActionResult Details(string appName, string id)
+        public ActionResult Details(string appName, string tableName)
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
-            DBTable table = DBTable.GetTable(id);
+            DBTable table = DBTable.GetTable(tableName);
 
             return View(table);
         }
-        public ActionResult Data(string appName, string id)
+        public ActionResult Data(string appName, string tableName)
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
-            DBTable table = DBTable.GetTable(id);
+            DBTable table = DBTable.GetTable(tableName);
             ViewBag.TableName = table.tableName;
             return View(table);
         }
@@ -55,7 +55,7 @@ namespace FSPOC2.Controllers
 
                 DBTable table = DBTable.Create(tableName);
                
-                foreach (DBColumn c in model._columns)
+                foreach (DBColumn c in model.columns)
                 {
                     table.AddColumn(c.Name, c.type, c.maxLength, c.canBeNull);
                 }
@@ -80,29 +80,19 @@ namespace FSPOC2.Controllers
 
         }
 
-        //public ActionResult AddColumn(int id)
-        //{
-        //    return View(new DBItems_Metadata_columns() { ItemId = id });
-        //}
-        //[HttpPost]
-        //public ActionResult AddColumn(int id, DBItems_Metadata_columns column, int type)
-        //{
-        //    Entities e = new Entities();
-        //    column.ItemId = id;
-        //    column.DBItems_Metadata_tables = e.DBItems_Metadata_tables.SingleOrDefault(i => i.Id == id);
-        //    column.DataTypeId = type;
-
-        //    if (ModelState.IsValid && column.DBItems_Metadata_tables != null)
-        //    {
-        //        e.DBItems_Metadata_columns.Add(column);
-        //        DBTable.GetTable(column.DBItems_Metadata_tables.Name)
-        //            .AddColumn(column.Name);
-        //        e.SaveChanges();
-
-        //        return RedirectToAction("Details", new { @id = id });
-        //    }
-
-        //    return View(column);
-        //}
+        public ActionResult AddColumn(string appName, string tableName)
+        {
+            return View(new DBColumn());
+        }
+        [HttpPost]
+        public ActionResult AddColumn(string appName, string tableName, DBColumn column)
+        {
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable.ApplicationName = appName;
+            DBTable.GetTable(tableName)
+                .AddColumn(column);
+            DBTable.SaveChanges();
+            return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
+        }
     }
 }

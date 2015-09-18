@@ -24,8 +24,6 @@
             var columnCount = $table.find('tr[data-id]').length;
             var nextId = columnCount; // index začíná 0
 
-            alert(nextId);
-
             var $newRow = $('#ColumnTemplate').clone();
             reindex($newRow, nextId);
             $newRow.find('input, select').attr('disabled', false);
@@ -72,19 +70,19 @@
                                 <th>Remove:</th>
                             </tr>
                             <tr id="ColumnTemplate" style="display: none">
-                                <td>@Html.TextBoxFor(x=>x._columns[0].Name, new {@disabled=true})</td>
+                                <td>@Html.TextBoxFor(x=>x.columns[0].Name, new {@disabled=true})</td>
                                 <td>
-                                    <select name="_columns[0].Type" disabled="True">
+                                    <select name="columns[0].Type" disabled="True">
                                         @foreach (SqlDbType type in types)
                                         {
                                             <option value="@((int) type)">@(type.ToString())</option>
                                         }
                                     </select>
                                 </td>
-                                <td>@Html.TextBoxFor(x => x._columns[0].maxLength, new { @disabled = true })</td>
-                                <td>@Html.CheckBoxFor(x => x._columns[0].isUnique, new { @disabled = true })</td>
-                                <td>@Html.CheckBoxFor(x => x._columns[0].canBeNull, new { @disabled = true })</td>
-                                <td>@Html.CheckBoxFor(x => x._columns[0].isPrimaryKey, new { @disabled = true })</td>
+                                <td>@Html.TextBoxFor(x => x.columns[0].maxLength, new { @disabled = true })</td>
+                                <td>@Html.CheckBoxFor(x => x.columns[0].isUnique, new { @disabled = true })</td>
+                                <td>@Html.CheckBoxFor(x => x.columns[0].canBeNull, new { @disabled = true })</td>
+                                <td>@Html.CheckBoxFor(x => x.columns[0].isPrimaryKey, new { @disabled = true })</td>
                                 @*<td>@Html.CheckBox("columnIdentity1", new {@disabled=true})</td>
     <td>@Html.TextBox("columnDefVal1", new {@disabled=true})</td>
     <td>@Html.CheckBox("columnIndex1", new {@disabled=true})</td>*@

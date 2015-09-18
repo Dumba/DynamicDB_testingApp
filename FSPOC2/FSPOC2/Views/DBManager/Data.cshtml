@@ -17,7 +17,7 @@
     <th>Unique</th>
     </thead>
     <tbody>
-        @foreach (DBColumn c in @Model.getColumnList())
+        @foreach (DBColumn c in @Model.columns)
         {
             <tr>
                 <td>@c.Name</td>
@@ -33,7 +33,7 @@
         @foreach (DBItem i in @Model.Select().ToList())
         {
             <tr>
-                @foreach (DBColumn co in @Model.getColumnList())
+                @foreach (DBColumn co in @Model.columns)
                 {
                     <th>@i[co.Name]</th>
                 }
