@@ -1,31 +1,112 @@
-﻿@using DynamicDB;
+﻿@using DynamicDB
+@using System.Data
 @model DBTable
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "Create";
+    var types = Enum.GetValues(typeof(SqlDbType));
+    int i = 0;
 }
+<script>
+    $(document).ready(function () {     // je nutné předělat tuto funkci aby se ukazovali všechny hodnoty které už tabulka obsahuje a ne jenom první hodnotu jako je tomu doteď
+        function reindex($row, newId) {
+            $row.find('input, select').each(function () {
+                this.name = this.name.replace(/\[[0-9]+\]/, '[' + newId + ']');
+            });
+            $row.attr('data-id', newId);
+        }
+        function reindexAll() {
+            $('#newColumn tr[data-id]').each(function (index) {
+                reindex($(this), index);
+            });
+        }
 
-<h2>Details</h2>
+        $('#btnAddColumn').click(function () {
+            var $table = $('#newColumn');
+            var columnCount = $table.find('tr[data-id]').length;
+            var nextId = columnCount; // index začíná 0
 
-<h3>Table: @Model.tableName</h3>
+            var $newRow = $('#ColumnTemplate').clone();
+            reindex($newRow, nextId);
+            $newRow.find('input, select').attr('disabled', false);
+            $newRow.removeAttr('id style');
+            $table.append($newRow);
+            return false;
+        });
 
-<table>
-    <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Max Length</th>
-        <th>Can be null?</th>
-    </tr>
-    @foreach(DBColumn column in Model.columns)
-    {
+        $(document).on('click', '.btnRemoveColumn', function () {
+            $(this).parents('tr').eq(0).remove();
+            reindexAll();
+            return false;
+        });
+
+        $('#btnAddColumn').click();
+    });
+</script>
+<h2>Detail</h2>
+
+@using (Html.BeginForm("AlterTable", "DBManager", new { @appName = Request["appName"] }, FormMethod.Post, null))
+{
+
+    <table class="table table-bordered" id="mytable">
+
         <tr>
-            <td>@column.Name</td>
-            <td>@column.type.ToString()</td>
-            <td>@column.maxLength.ToString()</td>
-            <td>@column.canBeNull.ToString()</td>
+            <th>Name: </th>
+            <td>@Html.TextBoxFor(x => x.tableName, "tableName")</td>
         </tr>
-    }
-</table>
+        <tr>
+            <th>New column: </th>
+            <td>
+                <table id="newColumn" class="table table-responsive table-bordered table-striped">
+                    <tbody>
+                    <tr>
+                        <th>Column Name:</th>
+                        <th>Data Type:</th>
+                        <th>Max Length:</th>
+                        <th>Unique:</th>
+                        <th>Nullable:</th>
+                        <th>Primary Key:</th>
+                        @*<th>Identity:</th>
+                                <th>Default Value:</th>
+                                <th>Index:</th>*@
+                        <th>Remove:</th>
+                   </tr>
+                       @for(i=0;i<Model.columns.Count;i++)
+                       {
+                           
+                            <tr id="ColumnTemplate" style="">
+                                <td>@Html.TextBoxFor(x => x.columns[i].Name, new {@disabled = true})</td>
+                                <td>
+                                    <select name="columns[i].Type" disabled="True">
+                                        @foreach (SqlDbType type in types)
+                                        {
+                                            <option value="@((int) type)">@(type.ToString())</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>@Html.TextBoxFor(x => x.columns[i].maxLength, new { @disabled = true })</td>
+                                <td>@Html.CheckBoxFor(x => x.columns[i].isUnique, new { @disabled = true })</td>
+                                <td>@Html.CheckBoxFor(x => x.columns[i].canBeNull, new { @disabled = true })</td>
+                                <td>@Html.CheckBoxFor(x => x.columns[i].isPrimaryKey, new { @disabled = true })</td>
+                                @*<td>@Html.CheckBox("columnIdentity1", new {@disabled=true})</td>
+                                <td>@Html.TextBox("columnDefVal1", new {@disabled=true})</td>
+                                <td>@Html.CheckBox("columnIndex1", new {@disabled=true})</td>*@
+                                <td><button class="btn btn-danger btnRemoveColumn">Remove</button></td>
+                            </tr>
+                           
+                       }
+                    </tbody>
+                </table>
+            </td>
+           
+        </tr> 
+        <tr>
+            <td>Actions:</td>
+            <td><button id="btnAddColumn" class="btn btn-success">Add Column</button></td>
+        </tr>
 
-@Html.ActionLink("Add column", "AddColumn", new { @tableName = Model.tableName, @appName = Request["appName"] })
-<br />
-@Html.ActionLink("back", "Index", new { @appName = Request["appName"] })
+    </table>
+
+    <button type="submit">Alter Table</button>
+    @Html.ActionLink("Back", "Index", new { @appName = ViewBag.appName })
+
+}

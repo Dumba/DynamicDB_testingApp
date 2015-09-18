@@ -24,7 +24,7 @@ namespace FSPOC2.Controllers
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-
+            ViewBag.appName = appName;
             DBTable table = DBTable.GetTable(tableName);
 
             return View(table);
@@ -93,6 +93,43 @@ namespace FSPOC2.Controllers
                 .AddColumn(column);
             DBTable.SaveChanges();
             return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
+        }
+
+        [HttpPost]
+        public ActionResult AlterTable(string appName, string tableName, DBTable model)
+        {
+            if (!string.IsNullOrWhiteSpace(tableName))
+            {
+                DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+                DBTable.ApplicationName = appName;
+                ViewBag.appName = appName;
+                DBTable table = DBTable.GetTable(tableName);
+                bool isEqual;
+                foreach (DBColumn c in model.columns)
+                {
+                    isEqual = false;
+                    foreach (DBColumn d in table.columns)
+                    {
+                        if (c.Name==d.Name)
+                        {
+                            table.ModifyColumn(c.Name, c.type, c.maxLength, c.canBeNull);
+                            isEqual = true;
+                        }
+                        
+                    }
+                    if (isEqual==false)
+                    {
+                        table.AddColumn(c.Name, c.type, c.maxLength, c.canBeNull);
+                    }
+                    
+                }
+
+                DBTable.SaveChanges();
+
+                return RedirectToAction("Index", new { @appName = appName });
+            }
+
+            return View();
         }
     }
 }
