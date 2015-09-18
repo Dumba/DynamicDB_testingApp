@@ -57,7 +57,7 @@ namespace FSPOC2.Controllers
                
                 foreach (DBColumn c in model.columns)
                 {
-                    table.AddColumn(c.Name, c.type, c.maxLength, c.canBeNull);
+                    table.columns.Add(c.Name, c.type, c.maxLength, c.canBeNull);
                 }
                 
                 DBTable.SaveChanges();
@@ -91,7 +91,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable.ApplicationName = appName;
             DBTable.GetTable(tableName)
-                .AddColumn(column);
+                .columns.Add(column);
             DBTable.SaveChanges();
             return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
         }
@@ -113,14 +113,14 @@ namespace FSPOC2.Controllers
                     {
                         if (c.Name == d.Name)
                         {
-                            table.ModifyColumn(c.Name, c.type, c.maxLength, c.canBeNull);
+                            table.columns.Modify(c.Name, c.type, c.maxLength, c.canBeNull);
                             isEqual = true;
                         }
 
                     }
                     if (isEqual == false)
                     {
-                        table.AddColumn(c.Name, c.type, c.maxLength, c.canBeNull);
+                        table.columns.Add(c.Name, c.type, c.maxLength, c.canBeNull);
                     }
 
                 }
@@ -140,7 +140,7 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
 
             DBTable.GetTable(tableName)
-                .DropColumn(columnName);
+                .columns.Drop(columnName);
             DBTable.SaveChanges();
             return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
         }
