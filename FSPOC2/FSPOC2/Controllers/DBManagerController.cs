@@ -68,11 +68,12 @@ namespace FSPOC2.Controllers
             return View();
         }
 
-        public ActionResult DropTable(string appName, string id)
+        public ActionResult DropTable(string appName, string tableName)
         {
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable.ApplicationName = appName;
 
-            DBTable table = DBTable.GetTable(id);
+            DBTable table = DBTable.GetTable(tableName);
             table.Drop();
             DBTable.SaveChanges();
 
@@ -110,26 +111,38 @@ namespace FSPOC2.Controllers
                     isEqual = false;
                     foreach (DBColumn d in table.columns)
                     {
-                        if (c.Name==d.Name)
+                        if (c.Name == d.Name)
                         {
                             table.ModifyColumn(c.Name, c.type, c.maxLength, c.canBeNull);
                             isEqual = true;
                         }
-                        
+
                     }
-                    if (isEqual==false)
+                    if (isEqual == false)
                     {
                         table.AddColumn(c.Name, c.type, c.maxLength, c.canBeNull);
                     }
-                    
+
                 }
 
                 DBTable.SaveChanges();
 
-                return RedirectToAction("Index", new { @appName = appName });
+                return RedirectToAction("Index", new {@appName = appName});
             }
 
             return View();
+
+        }
+
+        public ActionResult DropColumn(string appName, string tableName, string columnName)
+        {
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable.ApplicationName = appName;
+
+            DBTable.GetTable(tableName)
+                .DropColumn(columnName);
+            DBTable.SaveChanges();
+            return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
         }
     }
 }
