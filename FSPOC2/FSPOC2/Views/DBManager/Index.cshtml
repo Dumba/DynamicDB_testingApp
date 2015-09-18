@@ -10,8 +10,8 @@
     @foreach (DBTable item in Model)
     {
         <tr>
-            <td>@Html.ActionLink(item.tableName, "Data", new { @appName = Request["appName"], @id = item.tableName })</td>
-            <td>@Html.ActionLink("Manage", "Details", new { @appName = Request["appName"], @id = item.tableName })</td>
+            <td>@Html.ActionLink(item.tableName, "Data", new { @appName = Request["appName"], @tableName = item.tableName })</td>
+            <td>@Html.ActionLink("Manage", "Details", new { @appName = Request["appName"], @tableName = item.tableName })</td>
         </tr>
     }
 </table>

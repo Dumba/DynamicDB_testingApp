@@ -6,18 +6,26 @@
 
 <h2>Details</h2>
 
+<h3>Table: @Model.tableName</h3>
+
 <table>
     <tr>
         <th>Name</th>
-        <td>@Model.tableName</td>
+        <th>Type</th>
+        <th>Max Length</th>
+        <th>Can be null?</th>
     </tr>
-    @foreach(DBColumn column in Model.getColumnList())
+    @foreach(DBColumn column in Model.columns)
     {
         <tr>
-            <th>Column</th>
             <td>@column.Name</td>
+            <td>@column.type.ToString()</td>
+            <td>@column.maxLength.ToString()</td>
+            <td>@column.canBeNull.ToString()</td>
         </tr>
     }
 </table>
 
+@Html.ActionLink("Add column", "AddColumn", new { @tableName = Model.tableName, @appName = Request["appName"] })
+<br />
 @Html.ActionLink("back", "Index", new { @appName = Request["appName"] })

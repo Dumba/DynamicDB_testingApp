@@ -1,12 +1,17 @@
-﻿@using FSPOC2.Models;
-@model DBItems_Metadata_column
+﻿@using DynamicDB;
+@model DBColumn
 @{
     ViewBag.Title = "AddColumn";
+    List<SelectListItem> types = new List<SelectListItem>();
+    foreach(System.Data.SqlDbType type in Enum.GetValues(typeof(System.Data.SqlDbType)))
+    {
+        types.Add(new SelectListItem() { Text = type.ToString(), Value = ((int)type).ToString() });
+    }
 }
 
 <h2>Add Column</h2>
 
-@using (Html.BeginForm("AddColumn", "DBManager"))
+@using (Html.BeginForm("AddColumn", "DBManager", new { appName = Request["appName"], tableName = Request["tableName"] }))
 {
     <table>
         <tr>
@@ -16,20 +21,19 @@
         <tr>
             <th>Data Type:</th>
             <td>
-                <select name="type">
-                    @foreach (DBItems_Metadata_datatypes type in (new Entities()).DBItems_Metadata_datatypes)
-                    {
-                        <option value="@type.Id">@type.Name</option>
-                    }
-                </select>
+                @Html.DropDownListFor(c => c.type, types)
             </td>
         </tr>
         <tr>
             <th>Maximum length: </th>
-            <td>@Html.TextBoxFor(m => m.MaxLength)</td>
+            <td>@Html.TextBoxFor(m => m.maxLength)</td>
+        </tr>
+        <tr>
+            <th>Can be null?</th>
+            <td>@Html.CheckBoxFor(c => c.canBeNull)</td>
         </tr>
     </table>
 
     <button>Add</button>
-    @Html.ActionLink("Back", "Details", new { @id = Model.ItemId })
+    @Html.ActionLink("Back", "Details", new { @appName = Request["appName"], @tableName = Request["tableName"] })
 }
