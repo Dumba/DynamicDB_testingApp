@@ -95,5 +95,15 @@ namespace FSPOC2.Controllers
             DBTable.SaveChanges();
             return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
         }
+        public ActionResult DropColumn(string appName, string tableName, string columnName)
+        {
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable.ApplicationName = appName;
+
+            DBTable.GetTable(tableName)
+                .DropColumn(columnName);
+            DBTable.SaveChanges();
+            return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
+        }
     }
 }

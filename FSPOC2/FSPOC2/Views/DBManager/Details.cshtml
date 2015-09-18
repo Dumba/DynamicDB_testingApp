@@ -14,6 +14,7 @@
         <th>Type</th>
         <th>Max Length</th>
         <th>Can be null?</th>
+        <th></th>
     </tr>
     @foreach(DBColumn column in Model.columns)
     {
@@ -22,6 +23,7 @@
             <td>@column.type.ToString()</td>
             <td>@column.maxLength.ToString()</td>
             <td>@column.canBeNull.ToString()</td>
+            <td>@Html.ActionLink("Drop column", "DropColumn", new { @tableName = Model.tableName, @appName = Request["appName"], @columnName = column.Name })</td>
         </tr>
     }
 </table>
