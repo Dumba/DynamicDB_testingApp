@@ -68,11 +68,12 @@ namespace FSPOC2.Controllers
             return View();
         }
 
-        public ActionResult DropTable(string appName, string id)
+        public ActionResult DropTable(string appName, string tableName)
         {
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable.ApplicationName = appName;
 
-            DBTable table = DBTable.GetTable(id);
+            DBTable table = DBTable.GetTable(tableName);
             table.Drop();
             DBTable.SaveChanges();
 
