@@ -11,7 +11,8 @@
     {
         <tr>
             <td>@Html.ActionLink(item.tableName, "Data", new { @appName = Request["appName"], @id = item.tableName })</td>
-            <td>@Html.ActionLink("Manage", "Details", new { @appName = Request["appName"], @id = item.tableName })</td>
+            <td>@Html.ActionLink("Manage", "Details", new {@appName = Request["appName"], @id = item.tableName})</td>
+            <td>@Html.ActionLink("Drop", "DropTable", new { @appName = Request["appName"], @id = item.tableName })</td>
         </tr>
     }
 </table>

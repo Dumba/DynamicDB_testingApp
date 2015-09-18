@@ -68,6 +68,18 @@ namespace FSPOC2.Controllers
             return View();
         }
 
+        public ActionResult DropTable(string appName, string id)
+        {
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+
+            DBTable table = DBTable.GetTable(id);
+            table.Drop();
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Index", new {@appName = appName});
+
+        }
+
         //public ActionResult AddColumn(int id)
         //{
         //    return View(new DBItems_Metadata_columns() { ItemId = id });
