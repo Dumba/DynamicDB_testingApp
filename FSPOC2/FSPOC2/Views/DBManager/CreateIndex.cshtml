@@ -1,0 +1,44 @@
+﻿@using System.Web.UI.WebControls
+@model DynamicDB.DBTable
+@{
+    ViewBag.Title = "CreateIndex";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnAddColumn").click(function () {
+            $('#ColumnTemplate').clone(true).insertAfter('#ColumnTemplate')
+            return false;
+        });
+    });
+</script>
+
+
+
+<h2>Create Index</h2>
+@using (Html.BeginForm("AddIndex", "DBManager", new {@appName = Request["appName"]}, FormMethod.Post, null))
+{
+    <table class="table table-bordered" id="mytable">
+        <thead>
+        <tr>
+            <th>Název</th>
+            <td>@Html.TextBox("IndexName")</td>
+        </tr>
+        <tr>
+            <th>Vyberte sloupec</th>
+            <td id="ColumnTemplate">@Html.DropDownList("indexColumns", new SelectList(ViewBag.Columns, "Name"))</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Actions:</td>
+            <td><button id="btnAddColumn" class="btn btn-success">Add Column</button></td>
+        </tr>
+        </tbody>
+    </table>
+    <button type="submit">Create Index</button>
+}
+
+
+
+
+

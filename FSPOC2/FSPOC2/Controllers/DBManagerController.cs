@@ -144,5 +144,27 @@ namespace FSPOC2.Controllers
             DBTable.SaveChanges();
             return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
         }
+
+        public ActionResult CreateIndex(string appName, string tableName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            ViewBag.Columns = table.columns.colums.Select(x=>x.Name);
+            ViewBag.TableName = table.tableName;
+            return View(table);
+        }
+
+        public ActionResult AddIndex(string appName, string tableName,FormCollection fc, List<string> indexColumns)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+
+            DBTable table = DBTable.GetTable(tableName);
+            table.Index(fc["indexName"], indexColumns);
+            ViewBag.TableName = table.tableName;
+            return RedirectToAction("Index", new {@appName=appName});
+        }
     }
 }
