@@ -1,0 +1,23 @@
+﻿@model DynamicDB.DBTable
+@{
+    ViewBag.Title = "DropIndex";
+}
+
+<h2>DropIndex</h2>
+@using (Html.BeginForm("DeleteIndex", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }, FormMethod.Post, null))
+{
+    <table class="table table-bordered" id="mytable">
+        <thead>
+            <tr>
+                <th>Název indexu</th>
+                <td>@Html.DropDownList("indexName", new SelectList(Model.getIndexNames(Model.tableName).ToString(), "Name"))</td>
+            </tr>
+        </thead>
+        <tbody>
+           
+        </tbody>
+    </table>
+    <button type="submit">Create Index</button>
+}
+
+

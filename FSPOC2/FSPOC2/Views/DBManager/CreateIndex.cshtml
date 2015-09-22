@@ -15,7 +15,7 @@
 
 
 <h2>Create Index</h2>
-@using (Html.BeginForm("AddIndex", "DBManager", new {@appName = Request["appName"]}, FormMethod.Post, null))
+@using (Html.BeginForm("AddIndex", "DBManager", new {@appName = Request["appName"], @tableName=Model.tableName}, FormMethod.Post, null))
 {
     <table class="table table-bordered" id="mytable">
         <thead>

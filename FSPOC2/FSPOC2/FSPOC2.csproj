@@ -300,6 +300,7 @@
     <Content Include="Views\Home\Create.cshtml" />
     <Content Include="Views\DBManager\Data.cshtml" />
     <Content Include="Views\DBManager\CreateIndex.cshtml" />
+    <Content Include="Views\DBManager\DropIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

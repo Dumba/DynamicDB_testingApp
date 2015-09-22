@@ -162,9 +162,31 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            table.Index(fc["indexName"], indexColumns);
-            ViewBag.TableName = table.tableName;
+            table.createIndex(fc["indexName"], indexColumns);
+            DBTable.SaveChanges();
+
             return RedirectToAction("Index", new {@appName=appName});
+        }
+
+        public ActionResult DropIndex(string appName, string tableName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+        
+            return View(table);
+        }
+
+        public ActionResult DeleteIndex(string appName, string tableName, string indexName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            table.dropIndex(indexName);
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Index", new {@appName = appName});
         }
     }
 }
