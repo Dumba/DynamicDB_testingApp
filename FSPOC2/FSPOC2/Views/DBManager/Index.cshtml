@@ -14,7 +14,8 @@
             <td>@Html.ActionLink("Manage", "Details", new { @appName = Request["appName"], @tableName = item.tableName })</td>
             <td>@Html.ActionLink("Drop", "DropTable", new {@appName = Request["appName"], @tableName = item.tableName})</td>
             <td>@Html.ActionLink("CreateIndex", "CreateIndex", new { @appName = Request["appName"], @tableName = item.tableName })</td>
-            <td>@Html.ActionLink("DropIndex", "DropIndex", new { @appName = Request["appName"], @tableName = item.tableName })</td>
+            <td>@Html.ActionLink("DropIndex", "DropIndex", new {@appName = Request["appName"], @tableName = item.tableName})</td>
+            <td>@Html.ActionLink("CreateForeignKey", "CreateForeignKey", new { @appName = Request["appName"], @tableName = item.tableName })</td>
         </tr>
     }
 </table>

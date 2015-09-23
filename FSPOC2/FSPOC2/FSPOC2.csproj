@@ -301,6 +301,7 @@
     <Content Include="Views\DBManager\Data.cshtml" />
     <Content Include="Views\DBManager\CreateIndex.cshtml" />
     <Content Include="Views\DBManager\DropIndex.cshtml" />
+    <Content Include="Views\DBManager\CreateForeignKey.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

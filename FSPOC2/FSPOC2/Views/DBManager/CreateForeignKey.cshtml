@@ -1,0 +1,43 @@
+﻿@using System.Web.UI.WebControls
+@model DynamicDB.DBTable
+@{
+    ViewBag.Title = "CreateForeignKey";
+}
+<script type="text/javascript">
+    $(function () {
+        $(document).on('change', '#TableB', function () {
+            $.getJSON('/DBManager/getTableColumns?appName=@(Request["appName"])&tableName=' + $(this).val(), function (data) {
+                $.each(data, function (i, item) {
+                    $('#TableBColumns').append('<option>' + item + '</option>');
+                });
+            });
+        });
+        $('#TableB').change();
+    });
+</script>
+<h2>CreateForeignKey</h2>
+
+@using (Html.BeginForm("AddForeignKey", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }))
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Tabulka A</th>
+                <th>Tabulka B</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.tableName</td>
+                <td>@Html.DropDownList("TableB", new SelectList(ViewBag.Tables))</td>
+            </tr>
+            <tr>
+                <td>@Html.DropDownList("TableAColumns", new SelectList(ViewBag.Columns))</td>
+                <td>@Html.DropDownList("TableBColumns", new SelectList(new List<string>()))</td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit">Create Foreign Key</button>
+    @Html.ActionLink("Back", "Index", new { @appName = ViewBag.appName })
+}
+

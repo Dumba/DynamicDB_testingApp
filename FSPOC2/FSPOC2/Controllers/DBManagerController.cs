@@ -139,6 +139,8 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable.ApplicationName = appName;
 
+            ViewBag.appName = appName;
+
             DBTable.GetTable(tableName)
                 .columns.Drop(columnName);
             DBTable.SaveChanges();
@@ -151,6 +153,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
+            ViewBag.appName = appName;
             ViewBag.Columns = table.columns.Select(x=>x.Name);
             return View(table);
         }
@@ -172,7 +175,8 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-        
+            ViewBag.appName = appName;
+
             return View(table);
         }
 
@@ -186,6 +190,40 @@ namespace FSPOC2.Controllers
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});
+        }
+
+        public ActionResult CreateForeignKey(string appName, string tableName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+            
+            ViewBag.Tables = DBTable.GetAll().Select(t=>t.tableName).ToList();
+            ViewBag.Columns = table.columns.Select(x => x.Name);
+            ViewBag.appName = appName;
+            return View(table);
+        }
+
+        public ActionResult AddForeignKey(string appName, DBTable model , FormCollection fc)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+
+            DBTable.AddForeignKey(model.tableName, fc.Get("tableAColumns"), fc.Get("tableB"), fc.Get("tableBColumns"));
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Index", new {@appName = appName});
+        }
+
+        public JsonResult getTableColumns(string tableName, string appName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+
+            DBTable table = DBTable.GetTable(tableName);
+            List<string> tableColumns = table.columns.Select(x => x.Name);
+
+            return Json(tableColumns, JsonRequestBehavior.AllowGet);
         }
     }
 }
