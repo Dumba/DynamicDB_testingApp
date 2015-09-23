@@ -10,14 +10,14 @@
         <thead>
             <tr>
                 <th>Název indexu</th>
-                <td>@Html.DropDownList("indexName", new SelectList(Model.getIndexNames(Model.tableName).ToString(), "Name"))</td>
+                <td>@Html.DropDownList("indexName", new SelectList(ViewBag.Indexes, "Name"))</td>
             </tr>
         </thead>
         <tbody>
            
         </tbody>
     </table>
-    <button type="submit">Create Index</button>
+    <button type="submit">Drop Index</button>
 }
 
 
