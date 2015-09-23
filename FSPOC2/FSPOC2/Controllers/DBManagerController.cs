@@ -151,8 +151,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            ViewBag.Columns = table.columns.colums.Select(x=>x.Name);
-            ViewBag.TableName = table.tableName;
+            ViewBag.Columns = table.columns.Select(x=>x.Name);
             return View(table);
         }
 
@@ -162,7 +161,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            table.createIndex(fc["indexName"], indexColumns);
+            table.indices.Add(fc["indexName"], indexColumns);
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName=appName});
@@ -183,7 +182,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            table.dropIndex(indexName);
+            table.indices.Drop(indexName);
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});
