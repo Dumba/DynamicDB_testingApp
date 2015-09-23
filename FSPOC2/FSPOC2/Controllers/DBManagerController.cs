@@ -173,7 +173,7 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-        
+            ViewBag.Indexes = table.getIndexNames(tableName);
             return View(table);
         }
 
