@@ -35,7 +35,6 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            ViewBag.TableName = table.tableName;
             return View(table);
         }
 
@@ -51,14 +50,9 @@ namespace FSPOC2.Controllers
             if (!string.IsNullOrWhiteSpace(tableName))
             {
                 DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-                DBTable.ApplicationName = appName;
 
-                DBTable table = DBTable.Create(tableName);
-               
-                foreach (DBColumn c in model.columns)
-                {
-                    table.columns.Add(c.Name, c.type, c.maxLength, c.canBeNull);
-                }
+                model.AppName = appName;
+                model.Create();
                 
                 DBTable.SaveChanges();
 
@@ -91,7 +85,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable.ApplicationName = appName;
             DBTable.GetTable(tableName)
-                .columns.Add(column);
+                .columns.AddToDB(column);
             DBTable.SaveChanges();
             return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
         }
@@ -113,21 +107,22 @@ namespace FSPOC2.Controllers
                     {
                         if (c.Name == d.Name)
                         {
-                            table.columns.Modify(c.Name, c.type, c.maxLength, c.canBeNull);
+                            table.columns.ModifyInDB(c.Name, c.type, c.allowColumnLength, c.maxLength, c.canBeNull, c.isPrimaryKey, c.isUnique, c.additionalOptions);
                             isEqual = true;
+                            break;
                         }
 
                     }
                     if (isEqual == false)
                     {
-                        table.columns.Add(c.Name, c.type, c.maxLength, c.canBeNull);
+                        table.columns.AddToDB(c.Name, c.type, c.allowColumnLength, c.maxLength, c.canBeNull, c.isPrimaryKey, c.isUnique, c.additionalOptions);
                     }
 
                 }
 
                 DBTable.SaveChanges();
 
-                return RedirectToAction("Index", new {@appName = appName});
+                return RedirectToAction("Index", new { @appName = appName });
             }
 
             return View();
@@ -142,7 +137,7 @@ namespace FSPOC2.Controllers
             ViewBag.appName = appName;
 
             DBTable.GetTable(tableName)
-                .columns.Drop(columnName);
+                .columns.DropFromDB(columnName);
             DBTable.SaveChanges();
             return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
         }
@@ -154,7 +149,6 @@ namespace FSPOC2.Controllers
             DBTable table = DBTable.GetTable(tableName);
 
             ViewBag.appName = appName;
-            ViewBag.Columns = table.columns.Select(x=>x.Name);
             return View(table);
         }
 
@@ -164,7 +158,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            table.indices.Add(fc["indexName"], indexColumns);
+            table.indices.AddToDB(fc["indexName"], indexColumns);
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName=appName});
@@ -186,7 +180,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            table.indices.Drop(indexName);
+            table.indices.DropFromDB(indexName);
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});
@@ -221,7 +215,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            List<string> tableColumns = table.columns.Select(x => x.Name);
+            List<string> tableColumns = table.columns.Select(x => x.Name).ToList();
 
             return Json(tableColumns, JsonRequestBehavior.AllowGet);
         }

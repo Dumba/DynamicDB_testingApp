@@ -25,7 +25,7 @@
         </tr>
         <tr>
             <th>Vyberte sloupec</th>
-            <td id="ColumnTemplate">@Html.DropDownList("indexColumns", new SelectList(ViewBag.Columns, "Name"))</td>
+            <td id="ColumnTemplate">@Html.DropDownList("indexColumns", new SelectList(Model.columns.Select(c => c.Name), "Name"))</td>
         </tr>
         </thead>
         <tbody>
