@@ -45,9 +45,9 @@ namespace FSPOC2.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult Create(string appName, string tableName, DBTable model)
+        public ActionResult Create(string appName, DBTable model)
         {
-            if (!string.IsNullOrWhiteSpace(tableName))
+            if (!string.IsNullOrWhiteSpace(model.tableName))
             {
                 DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
