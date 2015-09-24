@@ -17,7 +17,7 @@
 </script>
 <h2>CreateForeignKey</h2>
 
-@using (Html.BeginForm("AddForeignKey", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }))
+@using (Html.BeginForm("AddForeignKey", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }, FormMethod.Post, null))
 {
     <table class="table table-bordered">
         <thead>

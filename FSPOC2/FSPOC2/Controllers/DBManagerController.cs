@@ -151,7 +151,7 @@ namespace FSPOC2.Controllers
             ViewBag.appName = appName;
             return View(table);
         }
-
+         [HttpPost]
         public ActionResult AddIndex(string appName, string tableName,FormCollection fc, List<string> indexColumns)
         {
             DBTable.ApplicationName = appName;
@@ -173,7 +173,7 @@ namespace FSPOC2.Controllers
 
             return View(table);
         }
-
+         [HttpPost]
         public ActionResult DeleteIndex(string appName, string tableName, string indexName)
         {
             DBTable.ApplicationName = appName;
@@ -197,7 +197,7 @@ namespace FSPOC2.Controllers
             ViewBag.appName = appName;
             return View(table);
         }
-
+         [HttpPost]
         public ActionResult AddForeignKey(string appName, DBTable model , FormCollection fc)
         {
             DBTable.ApplicationName = appName;
@@ -207,6 +207,41 @@ namespace FSPOC2.Controllers
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});
+        }
+
+        public ActionResult CreatePrimaryKey(string appName, string tableName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            ViewBag.appName = appName;
+            ViewBag.Columns = table.columns.Select(x => x.Name);
+            return View(table);
+        }
+
+        [HttpPost]
+        public ActionResult AddPrimaryKey(string appName, string tableName, List<string> primaryKeys)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            table.AddPrimaryKey(primaryKeys);
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Index", new {@appName = appName});
+        }
+
+        public ActionResult DropPrimaryKey(string appName, string tableName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            table.DropPrimaryKey();
+            DBTable.SaveChanges();
+            return RedirectToAction("Index",new{@appName=appName});
         }
 
         public JsonResult getTableColumns(string tableName, string appName)

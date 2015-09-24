@@ -1,0 +1,39 @@
+﻿@model Entitron.DBTable
+@{
+    ViewBag.Title = "CreatePrimaryKey";
+}
+
+<h2>CreatePrimaryKey</h2>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnAddColumn").click(function () {
+            $('#ColumnTemplate').clone(true).insertAfter('#ColumnTemplate')
+            return false;
+        });
+    });
+</script>
+
+@using (Html.BeginForm("AddPrimaryKey", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }, FormMethod.Post, null))
+{
+    <table class="table table-bordered" style="width: 200px">
+        <thead>
+            <tr>
+                <th>Sloupec primárního klíče</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="ColumnTemplate">
+                    @Html.DropDownList("primaryKeys", new SelectList(ViewBag.Columns))
+                </td>
+            </tr>
+            <tr>
+                <td><button id="btnAddColumn" class="btn btn-success">Add Column</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit">Create Primary Key</button>
+    @Html.ActionLink("Index","DBManager", new{@appName=ViewBag.appName})
+}
+
