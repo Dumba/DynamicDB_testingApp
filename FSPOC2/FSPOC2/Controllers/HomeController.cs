@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using FSPOC2.Models;
-using DynamicDB.Sql;
+using Entitron.Sql;
 
 namespace FSPOC2.Controllers
 {
