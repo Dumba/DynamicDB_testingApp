@@ -198,12 +198,12 @@ namespace FSPOC2.Controllers
             return View(table);
         }
          [HttpPost]
-        public ActionResult AddForeignKey(string appName, DBTable model , FormCollection fc)
+        public ActionResult AddForeignKey(string appName, string tableName , FormCollection fc)
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
-            DBTable.AddForeignKey(model.tableName, fc.Get("tableAColumns"), fc.Get("tableB"), fc.Get("tableBColumns"));
+            DBTable.AddForeignKey(tableName, fc.Get("TableAColumns"), fc.Get("TableB"), fc.Get("TableBColumns"));
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});
