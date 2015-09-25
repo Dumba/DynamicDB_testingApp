@@ -170,7 +170,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
             ViewBag.appName = appName;
-
+            ViewBag.Indexes = table.indices.getIndeces();
             return View(table);
         }
          [HttpPost]
@@ -202,8 +202,32 @@ namespace FSPOC2.Controllers
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
 
-            DBTable.AddForeignKey(tableName, fc.Get("TableAColumns"), fc.Get("TableB"), fc.Get("TableBColumns"));
+            table.AddForeignKey(tableName, fc.Get("TableAColumns"), fc.Get("TableB"), fc.Get("TableBColumns"));
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Index", new {@appName = appName});
+        }
+
+        public ActionResult DropForeignKey(string appName, string tableName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            ViewBag.appName = appName;
+            ViewBag.ForeignKeys = table.GetForeignKeys();
+            return View(table);
+        }
+
+        public ActionResult DeleteForeignKey(string appName, string tableName, string foreignKeyName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            table.DropForeignKey(foreignKeyName);
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});

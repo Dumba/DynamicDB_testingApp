@@ -10,7 +10,7 @@
     <thead>
         <tr>
             <th>Table Name</th>
-            <th colspan="7">Actions</th>
+            <th colspan="8">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -24,7 +24,8 @@
                 <td>@Html.ActionLink("DropIndex", "DropIndex", new { @appName = Request["appName"], @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("AddPrimaryKey", "CreatePrimaryKey", new {@appName = Request["appName"], @tableName = item.tableName})</td>
                 <td>@Html.ActionLink("DropPrimaryKey", "DropPrimaryKey", new { @appName = Request["appName"], @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("AddForeignKey", "CreateForeignKey", new { @appName = Request["appName"], @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("AddForeignKey", "CreateForeignKey", new {@appName = Request["appName"], @tableName = item.tableName})</td>
+                <td>@Html.ActionLink("DropForeignKey", "DropForeignKey", new { @appName = Request["appName"], @tableName = item.tableName })</td>
             </tr>
         }
     </tbody>

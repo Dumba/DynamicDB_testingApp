@@ -1,0 +1,22 @@
+﻿@model Entitron.DBTable
+@{
+    ViewBag.Title = "DropForeignKey";
+}
+
+<h2>DropForeignKey</h2>
+@using (Html.BeginForm("DeleteForeignKey", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }, FormMethod.Post, null))
+{
+    <table class="table table-bordered" id="mytable">
+        <thead>
+            <tr>
+                <th>Název cizího klíče</th>
+                <td>@Html.DropDownList("foreignKeyName", new SelectList(ViewBag.ForeignKeys, "Name"))</td>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <button type="submit">Drop Foreign Key</button>
+    @Html.ActionLink("Back", "Index", new { @appName = ViewBag.appName })
+}
+
+
