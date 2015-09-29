@@ -4,13 +4,13 @@
 }
 
 <h2>DropIndex</h2>
-@using (Html.BeginForm("DeleteIndex", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }, FormMethod.Post, null))
+@using (Html.BeginForm("DeleteIndex", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
 {
     <table class="table table-bordered" id="mytable">
         <thead>
             <tr>
                 <th>Název indexu</th>
-                <td>@Html.DropDownList("indexName", new SelectList(ViewBag.Indexes, "Name"))</td>
+                <td>@Html.DropDownList("indexName", new SelectList(Model.indices, "Name"))</td>
             </tr>
         </thead>
         <tbody>
@@ -18,7 +18,7 @@
         </tbody>
     </table>
     <button type="submit">Drop Index</button>
-    @Html.ActionLink("Back", "Index", new { @appName = ViewBag.appName })
+    @Html.ActionLink("Back", "Index", new { @appName = Model.AppName })
 }
 
 

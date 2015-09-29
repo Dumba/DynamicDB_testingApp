@@ -169,8 +169,6 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-            ViewBag.appName = appName;
-            ViewBag.Indexes = table.indices.getIndeces();
             return View(table);
         }
          [HttpPost]
