@@ -13,7 +13,6 @@ namespace FSPOC2.Controllers
     {
         public ActionResult Index(string appName)
         {
-            ViewBag.appName = appName;
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             List<DBTable> tables = DBTable.GetAll();
@@ -24,7 +23,6 @@ namespace FSPOC2.Controllers
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            ViewBag.appName = appName;
             DBTable table = DBTable.GetTable(tableName);
 
             return View(table);
@@ -40,7 +38,6 @@ namespace FSPOC2.Controllers
 
         public ActionResult Create(string appName)
         {
-            ViewBag.appName = appName;
 
             return View();
         }
@@ -97,7 +94,6 @@ namespace FSPOC2.Controllers
             {
                 DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
                 DBTable.ApplicationName = appName;
-                ViewBag.appName = appName;
                 DBTable table = DBTable.GetTable(tableName);
                 bool isEqual;
                 foreach (DBColumn c in model.columns)
@@ -134,8 +130,6 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable.ApplicationName = appName;
 
-            ViewBag.appName = appName;
-
             DBTable.GetTable(tableName)
                 .columns.DropFromDB(columnName);
             DBTable.SaveChanges();
@@ -148,7 +142,6 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            ViewBag.appName = appName;
             return View(table);
         }
          [HttpPost]
@@ -192,7 +185,6 @@ namespace FSPOC2.Controllers
             
             ViewBag.Tables = DBTable.GetAll().Select(t=>t.tableName).ToList();
             ViewBag.Columns = table.columns.Select(x => x.Name);
-            ViewBag.appName = appName;
             return View(table);
         }
          [HttpPost]
@@ -202,7 +194,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            table.AddForeignKey(tableName, fc.Get("TableAColumns"), fc.Get("TableB"), fc.Get("TableBColumns"));
+            table.AddForeignKey(fc.Get("foreignName"), tableName, fc.Get("TableAColumns"), fc.Get("TableB"), fc.Get("TableBColumns"));
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});
@@ -214,7 +206,6 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            ViewBag.appName = appName;
             ViewBag.ForeignKeys = table.GetForeignKeys();
             return View(table);
         }
@@ -237,7 +228,6 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            ViewBag.appName = appName;
             ViewBag.Columns = table.columns.Select(x => x.Name);
             return View(table);
         }

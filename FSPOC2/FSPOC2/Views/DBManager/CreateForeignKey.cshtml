@@ -17,14 +17,18 @@
 </script>
 <h2>CreateForeignKey</h2>
 
-@using (Html.BeginForm("AddForeignKey", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }, FormMethod.Post, null))
+@using (Html.BeginForm("AddForeignKey", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
 {
     <table class="table table-bordered">
         <thead>
-            <tr>
-                <th>Tabulka A</th>
-                <th>Tabulka B</th>
-            </tr>
+        <tr>
+            <th>Zvolte název</th>
+            <td>@Html.TextBox("foreignName")</td>
+        </tr>
+        <tr>
+            <th>Tabulka A</th>
+            <th>Tabulka B</th>
+        </tr>
         </thead>
         <tbody>
             <tr>
@@ -38,6 +42,6 @@
         </tbody>
     </table>
     <button type="submit">Create Foreign Key</button>
-    @Html.ActionLink("Back", "Index", new { @appName = ViewBag.appName })
+    @Html.ActionLink("Back", "Index", new { @appName = Model.AppName })
 }
 

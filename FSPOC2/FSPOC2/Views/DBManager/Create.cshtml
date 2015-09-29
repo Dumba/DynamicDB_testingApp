@@ -43,7 +43,7 @@
 </script>
 <h2>Create</h2>
 
-@using (Html.BeginForm("Create", "DBManager", new { @appName = Request["appName"] }, FormMethod.Post, null))
+@using (Html.BeginForm("Create", "DBManager", new { @appName = Model.AppName }, FormMethod.Post, null))
 {
 
     <table class="table table-bordered" id="mytable">
@@ -101,6 +101,6 @@
     </table>
 
             <button type="submit">Create</button>
-            @Html.ActionLink("Back", "Index", new { @appName = ViewBag.appName })
+            @Html.ActionLink("Back", "Index", new { @appName = Model.AppName })
       
 }

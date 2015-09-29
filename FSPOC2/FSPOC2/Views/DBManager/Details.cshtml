@@ -45,7 +45,7 @@
     </script>
     <h2>Detail</h2>
 
-    @using (Html.BeginForm("AlterTable", "DBManager", new { @appName = Request["appName"] }, FormMethod.Post, null))
+    @using (Html.BeginForm("AlterTable", "DBManager", new { @appName = Model.AppName }, FormMethod.Post, null))
     {
 
         <table class="table table-bordered" id="mytable">
@@ -62,14 +62,14 @@
     </tr>
     </thead>
             <tbody>
-        @foreach (DBColumn column in Model.columns)
+        @for (int t=0;t<Model.columns.Count;t++)
         {
             <tr>
-                <td>@column.Name</td>
-                <td>@column.type.ToString()</td>
-                <td>@column.maxLength.ToString()</td>
-                <td>@column.canBeNull.ToString()</td>
-                <td>@Html.ActionLink("Drop column", "DropColumn", new {@tableName = Model.tableName, @appName = Request["appName"], @columnName = column.Name})</td>
+                <td>@Html.TextBoxFor(c=>c.columns[t].Name)</td>
+                @*<td>@column.type.ToString()</td>*@
+                <td>@Html.TextBoxFor(c => c.columns[t].maxLength)</td>
+                <td>@Html.TextBoxFor(c => c.columns[t].canBeNull)</td>
+                <td>@Html.ActionLink("Drop column", "DropColumn", new {@tableName = Model.tableName, @appName = Request["appName"], @columnName = Model.columns[t].Name})</td>
 
             </tr>
         }
@@ -81,6 +81,6 @@
         </table>
 
 <button type="submit">Alter Table</button>
-@Html.ActionLink("Back", "Index", new { @appName = ViewBag.appName })
+@Html.ActionLink("Back", "Index", new { @appName = Model.AppName })
 
 }

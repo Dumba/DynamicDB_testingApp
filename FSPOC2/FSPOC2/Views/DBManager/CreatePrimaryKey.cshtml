@@ -14,7 +14,7 @@
     });
 </script>
 
-@using (Html.BeginForm("AddPrimaryKey", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }, FormMethod.Post, null))
+@using (Html.BeginForm("AddPrimaryKey", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
 {
     <table class="table table-bordered" style="width: 200px">
         <thead>
@@ -34,6 +34,6 @@
         </tbody>
     </table>
     <button type="submit">Create Primary Key</button>
-    @Html.ActionLink("Index","DBManager", new{@appName=ViewBag.appName})
+    @Html.ActionLink("Back", "Index", new { @appName = Model.AppName })
 }
 

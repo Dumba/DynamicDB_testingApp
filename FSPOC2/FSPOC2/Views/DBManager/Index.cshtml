@@ -17,15 +17,15 @@
         @foreach (DBTable item in Model)
         {
             <tr>
-                <td>@Html.ActionLink(item.tableName, "Data", new { @appName = Request["appName"], @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("Manage", "Details", new { @appName = Request["appName"], @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("DropTable", "DropTable", new { @appName = Request["appName"], @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("CreateIndex", "CreateIndex", new { @appName = Request["appName"], @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("DropIndex", "DropIndex", new { @appName = Request["appName"], @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("AddPrimaryKey", "CreatePrimaryKey", new {@appName = Request["appName"], @tableName = item.tableName})</td>
-                <td>@Html.ActionLink("DropPrimaryKey", "DropPrimaryKey", new { @appName = Request["appName"], @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("AddForeignKey", "CreateForeignKey", new {@appName = Request["appName"], @tableName = item.tableName})</td>
-                <td>@Html.ActionLink("DropForeignKey", "DropForeignKey", new { @appName = Request["appName"], @tableName = item.tableName })</td>
+                <td>@Html.ActionLink(item.tableName, "Data", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("Manage", "Details", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropTable", "DropTable", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("CreateIndex", "CreateIndex", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropIndex", "DropIndex", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("AddPrimaryKey", "CreatePrimaryKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropPrimaryKey", "DropPrimaryKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("AddForeignKey", "CreateForeignKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropForeignKey", "DropForeignKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
             </tr>
         }
     </tbody>

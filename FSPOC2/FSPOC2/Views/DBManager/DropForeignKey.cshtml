@@ -4,7 +4,7 @@
 }
 
 <h2>DropForeignKey</h2>
-@using (Html.BeginForm("DeleteForeignKey", "DBManager", new { @appName = Request["appName"], @tableName = Model.tableName }, FormMethod.Post, null))
+@using (Html.BeginForm("DeleteForeignKey", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
 {
     <table class="table table-bordered" id="mytable">
         <thead>
@@ -16,7 +16,7 @@
         <tbody></tbody>
     </table>
     <button type="submit">Drop Foreign Key</button>
-    @Html.ActionLink("Back", "Index", new { @appName = ViewBag.appName })
+    @Html.ActionLink("Back", "Index", new { @appName = Model.AppName })
 }
 
 
