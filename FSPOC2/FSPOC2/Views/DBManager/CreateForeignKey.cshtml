@@ -1,47 +1,49 @@
 ﻿@using System.Web.UI.WebControls
-@model Entitron.DBTable
+@using Entitron
+@model DBForeignKey
 @{
     ViewBag.Title = "CreateForeignKey";
 }
 <script type="text/javascript">
     $(function () {
-        $(document).on('change', '#TableB', function () {
+        $(document).on('change', '#targetTable', function () {
             $.getJSON('/DBManager/getTableColumns?appName=@(Request["appName"])&tableName=' + $(this).val(), function (data) {
+                $('#targetColumn').html('');
                 $.each(data, function (i, item) {
-                    $('#TableBColumns').append('<option>' + item + '</option>');
+                    $('#targetColumn').append('<option>' + item + '</option>');
                 });
             });
         });
-        $('#TableB').change();
+        $('#targetTable').change();
     });
 </script>
 <h2>CreateForeignKey</h2>
 
-@using (Html.BeginForm("AddForeignKey", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
+@using (Html.BeginForm("AddForeignKey", "DBManager", new { @appName = Request["appName"], @tableName = Model.sourceTable }, FormMethod.Post, null))
 {
     <table class="table table-bordered">
         <thead>
-        <tr>
-            <th>Zvolte název</th>
-            <td>@Html.TextBox("foreignName")</td>
-        </tr>
-        <tr>
-            <th>Tabulka A</th>
-            <th>Tabulka B</th>
-        </tr>
+            <tr>
+                <th>Jméno</th>
+                <td>@Html.TextBoxFor(fk => fk.name)</td>
+            </tr>
+            <tr>
+                <th>Tabulka A</th>
+                <th>Tabulka B</th>
+            </tr>
         </thead>
         <tbody>
             <tr>
-                <td>@Model.tableName</td>
-                <td>@Html.DropDownList("TableB", new SelectList(ViewBag.Tables))</td>
+                <td>@Model.sourceTable @Html.HiddenFor(fk => fk.sourceTable)</td>
+                <td>@Html.DropDownListFor(fk => fk.targetTable, new SelectList(DBTable.GetAll().Select(t => t.tableName)))</td>
             </tr>
             <tr>
-                <td>@Html.DropDownList("TableAColumns", new SelectList(ViewBag.Columns))</td>
-                <td>@Html.DropDownList("TableBColumns", new SelectList(new List<string>()))</td>
+                <td>@Html.DropDownListFor(fk => fk.sourceColumn, new SelectList(ViewBag.Columns))</td>
+                <td>@Html.DropDownListFor(fk => fk.targetColumn, new SelectList(new List<string>()))</td>
             </tr>
         </tbody>
     </table>
     <button type="submit">Create Foreign Key</button>
-    @Html.ActionLink("Back", "Index", new { @appName = Model.AppName })
+    @Html.ActionLink("Back", "Index", new { @appName = Request["appName"] })
 }
 
