@@ -194,7 +194,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            table.AddForeignKey(fc.Get("foreignName"), tableName, fc.Get("TableAColumns"), fc.Get("TableB"), fc.Get("TableBColumns"));
+            table.AddForeignKey(fc.Get("foreignName"), tableName, fc.Get("TableAColumns"), fc.Get("TableB"), fc.Get("TableBColumns"), fc.Get("deleteAction"), fc.Get("updateAction"));
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});
@@ -254,6 +254,60 @@ namespace FSPOC2.Controllers
             table.DropPrimaryKey();
             DBTable.SaveChanges();
             return RedirectToAction("Index",new{@appName=appName});
+        }
+
+        [HttpPost]
+        public ActionResult InsertRow(string appName, string tableName, FormCollection fc)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+
+            DBTable table = DBTable.GetTable(tableName);
+            Dictionary<DBColumn, object> val=new Dictionary<DBColumn, object>();
+            
+            foreach (DBColumn c in table.columns)
+            {
+                val.Add(c, fc.Get("valueOf" + c.Name));
+            }
+
+            table.Insert(val);
+            DBTable.SaveChanges();
+            return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
+        }
+
+        public ActionResult UpdateRow(string appName, string tableName, FormCollection fc, int rowNumber)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+
+            DBTable table = DBTable.GetTable(tableName);
+            Dictionary<DBColumn, object> values = new Dictionary<DBColumn, object>();
+
+            foreach (DBColumn c in table.columns)
+            {
+                values.Add(c, fc.Get("valueOf" + c.Name));
+            }
+            table.Update(values, rowNumber);
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
+        }
+        [HttpPost]
+        public ActionResult DeleteRow(string appName, string tableName, FormCollection fs )
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+
+            DBTable table = DBTable.GetTable(tableName);
+            Dictionary<DBColumn,object> values=new Dictionary<DBColumn, object>();
+            foreach (DBColumn c in table.columns)
+            {
+                values.Add(c, fs["col" + c.Name]);
+            }
+            table.Delete(values);
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
         }
 
         public JsonResult getTableColumns(string tableName, string appName)

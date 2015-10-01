@@ -1,4 +1,5 @@
-﻿@using Entitron
+﻿@using System.Collections
+@using Entitron
 @model DBTable
 @{
     ViewBag.Title = "Data";
@@ -6,38 +7,47 @@
 
 <h2>Data tabulky @Model.tableName</h2>
 
-<table class="table-hover table-responsive table-condensed">
-    @*Zatím tabulka ukazuje jen sloupce a jejich nastavení ale později se v ní budou ukazovat hodnoty*@
+<table class="table table-bordered table-hover table-responsive table-condensed">
     <thead>
-    <th>Název sloupce</th>
-    <th>Typ</th>
-    <th>Null</th>
-    <th>Primary Key</th>
-    <th>Max Lenght</th>
-    <th>Unique</th>
+        <tr>
+            @foreach (DBColumn c1 in @Model.columns)
+            {
+                <th>@c1.Name (@c1.type [@c1.maxLength])</th>
+            }
+            <th>Actions</th>
+        </tr>
     </thead>
     <tbody>
-        @foreach (DBColumn c in @Model.columns)
-        {
-            <tr>
-                <td>@c.Name</td>
-                <td>@c.type</td>
-                <td>@c.canBeNull</td>
-                <td>@c.isPrimaryKey</td>
-                <td>@c.maxLength</td>
-                <td>@c.isUnique</td>
-            </tr>
-
-        }
-
         @foreach (DBItem i in @Model.Select().ToList())
         {
             <tr>
-                @foreach (DBColumn co in @Model.columns)
+                @using (Html.BeginForm("DeleteRow", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
                 {
-                    <th>@i[co.Name]</th>
+                    foreach (DBColumn c2 in @Model.columns)
+                    {
+                        <td id="field">
+                            @Html.Hidden("col" + c2.Name, i[c2.Name])
+                            <p class="form-control-static"> @i[c2.Name]</p>
+                        </td>
+                    }
+                    <td>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </td>
                 }
             </tr>
         }
+        <tr>
+            @using (Html.BeginForm("InsertRow", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
+            {
+                foreach (DBColumn c3 in @Model.columns)
+                {
+                    <td>@Html.TextBox("valueOf" + c3.Name)</td>
+                }
+                <td>
+                    <button type="submit" class="btn-primary btn">Insert</button>
+                </td>
+            }
+
+        </tr>
     </tbody>
 </table>

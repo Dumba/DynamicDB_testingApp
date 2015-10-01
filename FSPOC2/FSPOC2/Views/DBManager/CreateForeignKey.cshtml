@@ -19,7 +19,7 @@
 
 @using (Html.BeginForm("AddForeignKey", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
 {
-    <table class="table table-bordered">
+    <table class="table table-bordered table-responsive">
         <thead>
         <tr>
             <th>Zvolte název</th>
@@ -31,15 +31,36 @@
         </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>@Model.tableName</td>
-                <td>@Html.DropDownList("TableB", new SelectList(ViewBag.Tables))</td>
-            </tr>
-            <tr>
-                <td>@Html.DropDownList("TableAColumns", new SelectList(ViewBag.Columns))</td>
-                <td>@Html.DropDownList("TableBColumns", new SelectList(new List<string>()))</td>
-            </tr>
+        <tr>
+            <td>@Model.tableName</td>
+            <td>@Html.DropDownList("TableB", new SelectList(ViewBag.Tables))</td>
+        </tr>
+        <tr>
+            <td>@Html.DropDownList("TableAColumns", new SelectList(ViewBag.Columns))</td>
+            <td>@Html.DropDownList("TableBColumns", new SelectList(new List<string>()))</td>
+        </tr>
+
         </tbody>
+    </table>
+    <table class="table table-bordered table-responsive">
+        <thead>
+        <tr>
+            <th>On Delete Action</th>
+            <td>
+                @Html.RadioButton("deleteAction", "cascade") Cascade
+                @Html.RadioButton("deleteAction", "null") Set Null
+                @Html.RadioButton("deleteAction", "default") Set Default
+            </td>
+        </tr>
+        <tr>
+            <th>On Update Action</th>
+            <td>
+                @Html.RadioButton("updateAction", "cascade") Cascade
+                @Html.RadioButton("updateAction", "null") Set Null
+                @Html.RadioButton("updateAction", "default") Set Default
+            </td>
+        </tr>
+        </thead>
     </table>
     <button type="submit">Create Foreign Key</button>
     @Html.ActionLink("Back", "Index", new { @appName = Model.AppName })
