@@ -46,7 +46,7 @@
   <ItemGroup>
     <Reference Include="Entitron, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS-platform\application\Entitron\Entitron\bin\Debug\Entitron.dll</HintPath>
+      <HintPath>..\..\..\FSPOC2\application\Entitron\Entitron\bin\Debug\Entitron.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
@@ -304,6 +304,7 @@
     <Content Include="Views\DBManager\CreateForeignKey.cshtml" />
     <Content Include="Views\DBManager\CreatePrimaryKey.cshtml" />
     <Content Include="Views\DBManager\DropForeignKey.cshtml" />
+    <Content Include="Views\DBManager\UpdateView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

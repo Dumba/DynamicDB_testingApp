@@ -3,9 +3,11 @@
 @model DBTable
 @{
     ViewBag.Title = "Data";
+    DBItem row = new DBItem();
 }
 
 <h2>Data tabulky @Model.tableName</h2>
+
 
 <table class="table table-bordered table-hover table-responsive table-condensed">
     <thead>
@@ -17,7 +19,7 @@
             <th>Actions</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="field">
         @foreach (DBItem i in @Model.Select().ToList())
         {
             <tr>
@@ -25,13 +27,18 @@
                 {
                     foreach (DBColumn c2 in @Model.columns)
                     {
-                        <td id="field">
+                        <td>
                             @Html.Hidden("col" + c2.Name, i[c2.Name])
                             <p class="form-control-static"> @i[c2.Name]</p>
+                            @{
+                        row[c2.Name] = i[c2.Name];
+                            }
                         </td>
+                       
                     }
-                    <td>
+                    <td id="btnContent">
                         <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="submit" name="Update" class="btn-success btn">Update</button>
                     </td>
                 }
             </tr>

@@ -38,7 +38,6 @@ namespace FSPOC2.Controllers
 
         public ActionResult Create(string appName)
         {
-
             return View();
         }
         [HttpPost]
@@ -129,7 +128,7 @@ namespace FSPOC2.Controllers
         {
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable.ApplicationName = appName;
-
+            
             DBTable.GetTable(tableName)
                 .columns.DropFromDB(columnName);
             DBTable.SaveChanges();
@@ -141,7 +140,7 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-
+            
             return View(table);
         }
          [HttpPost]
@@ -183,18 +182,19 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
             
-            ViewBag.Tables = DBTable.GetAll().Select(t=>t.tableName).ToList();
             ViewBag.Columns = table.columns.Select(x => x.Name);
-            return View(table);
+
+            return View(new DBForeignKey() { sourceTable = tableName });
         }
          [HttpPost]
-        public ActionResult AddForeignKey(string appName, string tableName , FormCollection fc)
+        public ActionResult AddForeignKey(string appName, string tableName, DBForeignKey model)
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            table.AddForeignKey(fc.Get("foreignName"), tableName, fc.Get("TableAColumns"), fc.Get("TableB"), fc.Get("TableBColumns"), fc.Get("deleteAction"), fc.Get("updateAction"));
+            table.foreignKeys.AddToDB(model);
+
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});
@@ -205,8 +205,7 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-
-            ViewBag.ForeignKeys = table.GetForeignKeys();
+            
             return View(table);
         }
 
@@ -216,7 +215,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
-            table.DropForeignKey(foreignKeyName);
+            table.foreignKeys.DropFromDB(foreignKeyName);
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new {@appName = appName});
@@ -227,7 +226,7 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-
+            
             ViewBag.Columns = table.columns.Select(x => x.Name);
             return View(table);
         }
@@ -263,35 +262,56 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            Dictionary<DBColumn, object> val=new Dictionary<DBColumn, object>();
-            
+            DBItem row=new DBItem();            
             foreach (DBColumn c in table.columns)
             {
-                val.Add(c, fc.Get("valueOf" + c.Name));
+                row[c.Name] = fc.Get("col" + c.Name);
             }
 
-            table.Insert(val);
+            table.Add(row);
             DBTable.SaveChanges();
             return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
         }
 
-        public ActionResult UpdateRow(string appName, string tableName, FormCollection fc, int rowNumber)
+        public ActionResult UpdateView(string appName, string tableName, DBItem row)
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            Dictionary<DBColumn, object> values = new Dictionary<DBColumn, object>();
+           //DBItem row = new DBItem();
+           //foreach (DBColumn c in table.columns)
+           //{
+           //    row[c.Name] = fc.Get("valueOf" + c.Name);
+           //}
+           // ViewBag.Row = row;
 
+            return View(table);
+
+        }
+
+        [HttpPost]
+        public ActionResult UpdateRow(string appName, string tableName, FormCollection fc, List<string> selectRow)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+
+            DBTable table = DBTable.GetTable(tableName);
+            DBItem changes=new DBItem();
+            DBItem row = new DBItem();
+            int i = 0;
             foreach (DBColumn c in table.columns)
             {
-                values.Add(c, fc.Get("valueOf" + c.Name));
+                changes[c.Name] = fc.Get("col" + c.Name);
+                row[c.Name] = selectRow[i];
+                i = +1;
             }
-            table.Update(values, rowNumber);
+            table.Update(changes,row);
             DBTable.SaveChanges();
 
             return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
         }
+
         [HttpPost]
         public ActionResult DeleteRow(string appName, string tableName, FormCollection fs )
         {
@@ -299,15 +319,26 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            Dictionary<DBColumn,object> values=new Dictionary<DBColumn, object>();
+            DBItem row=new DBItem();
+            List<string> rowForUpdate= new List<string>();
             foreach (DBColumn c in table.columns)
             {
-                values.Add(c, fs["col" + c.Name]);
+                row[c.Name] = fs.Get("col" + c.Name);
+                rowForUpdate.Add(fs.Get("col" + c.Name));
             }
-            table.Delete(values);
+            if (fs.Get("Update") != null)
+            {
+                ViewBag.Row = rowForUpdate;
+                return View("UpdateView", table);
+            }
+            else
+            {
+                table.Remove(row);
             DBTable.SaveChanges();
 
             return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
+            }
+            
         }
 
         public JsonResult getTableColumns(string tableName, string appName)
