@@ -23,7 +23,7 @@
         @foreach (DBItem i in @Model.Select().ToList())
         {
             <tr>
-                @using (Html.BeginForm("DeleteRow", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
+                @using (Html.BeginForm("DeleteOrUpdate", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
                 {
                     foreach (DBColumn c2 in @Model.columns)
                     {

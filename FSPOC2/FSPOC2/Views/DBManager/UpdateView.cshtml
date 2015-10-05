@@ -2,17 +2,22 @@
 @model Entitron.DBTable
 @{
     ViewBag.Title = "UpdateView";
-    List<string> values=new List<string>();
-    int i = 0;
+
+    List<object> values = new List<object>();
+    
+    foreach (object s in ViewBag.Row)
+    {
+        values.Add(s);
+    }
 }
 
 <h2>UpdateView</h2>
-@using (Html.BeginForm("UpdateRow", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName, @selectRow= ViewBag.Row }, FormMethod.Post, null))
+@using (Html.BeginForm("UpdateRow", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName}, FormMethod.Post, null))
 {
     <table class="table table-bordered table-responsive">
         <thead>
             <tr>
-                @foreach (DBColumn c1 in @Model.columns)
+                @foreach (DBColumn c1 in Model.columns)
                 {
                     <th>@c1.Name (@c1.type [@c1.maxLength])</th>
                 }
@@ -21,17 +26,11 @@
         </thead>
         <tbody>
         <tr>
-            @foreach (string s in ViewBag.Row)
-            {
-                values.Add(s);
-            }
-            @foreach (DBColumn c2 in @Model.columns)
+            @for (int i = 0; i < Model.columns.Count; i++)
             {
                 <td>
-                    @Html.TextBox("col" + c2.Name, values[i])
-                    @{i = i + 1;}
+                    @Html.TextBox("col" + Model.columns[i].Name, values[i])
                 </td>
-                
             }
             <td>
                 <button type="submit" class="btn-success btn">Confirm</button>

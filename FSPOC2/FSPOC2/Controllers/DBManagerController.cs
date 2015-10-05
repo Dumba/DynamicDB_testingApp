@@ -273,74 +273,55 @@ namespace FSPOC2.Controllers
             return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
         }
 
-        public ActionResult UpdateView(string appName, string tableName, DBItem row)
-        {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-
-            DBTable table = DBTable.GetTable(tableName);
-           //DBItem row = new DBItem();
-           //foreach (DBColumn c in table.columns)
-           //{
-           //    row[c.Name] = fc.Get("valueOf" + c.Name);
-           //}
-           // ViewBag.Row = row;
-
-            return View(table);
-
-        }
-
         [HttpPost]
-        public ActionResult UpdateRow(string appName, string tableName, FormCollection fc, List<string> selectRow)
-        {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-
-            DBTable table = DBTable.GetTable(tableName);
-            DBItem changes=new DBItem();
-            DBItem row = new DBItem();
-            int i = 0;
-            foreach (DBColumn c in table.columns)
-            {
-                changes[c.Name] = fc.Get("col" + c.Name);
-                row[c.Name] = selectRow[i];
-                i = +1;
-            }
-            table.Update(changes,row);
-            DBTable.SaveChanges();
-
-            return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
-        }
-
-        [HttpPost]
-        public ActionResult DeleteRow(string appName, string tableName, FormCollection fs )
+        public ActionResult DeleteOrUpdate(string appName, string tableName, FormCollection fs )
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
             DBItem row=new DBItem();
-            List<string> rowForUpdate= new List<string>();
+            
             foreach (DBColumn c in table.columns)
             {
                 row[c.Name] = fs.Get("col" + c.Name);
-                rowForUpdate.Add(fs.Get("col" + c.Name));
+                TempData.Remove(c.Name);
+                TempData.Add(c.Name,row[c.Name]);
             }
             if (fs.Get("Update") != null)
             {
-                ViewBag.Row = rowForUpdate;
+                ViewBag.Row = row.getAllProperties();
                 return View("UpdateView", table);
             }
             else
             {
                 table.Remove(row);
-            DBTable.SaveChanges();
+                DBTable.SaveChanges();
 
             return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
             }
             
         }
 
+        [HttpPost]
+        public ActionResult UpdateRow(string appName, string tableName, FormCollection fc)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+            DBItem changes = new DBItem();
+            DBItem oldVal = new DBItem();
+
+            foreach (DBColumn c in table.columns)
+            {
+                changes[c.Name] = fc.Get("col" + c.Name);
+                oldVal[c.Name] = TempData[c.Name];
+            }
+            table.Update(changes, oldVal);
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
+        }
         public JsonResult getTableColumns(string tableName, string appName)
         {
             DBTable.ApplicationName = appName;
