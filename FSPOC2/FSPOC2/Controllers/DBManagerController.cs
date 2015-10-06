@@ -38,6 +38,9 @@ namespace FSPOC2.Controllers
 
         public ActionResult Create(string appName)
         {
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable.ApplicationName = appName;
+            
             return View();
         }
         [HttpPost]
@@ -55,7 +58,7 @@ namespace FSPOC2.Controllers
                 return RedirectToAction("Index", new { @appName = appName });
             }
 
-            return View();
+            return View(model);
         }
 
         public ActionResult DropTable(string appName, string tableName)
@@ -254,7 +257,6 @@ namespace FSPOC2.Controllers
             DBTable.SaveChanges();
             return RedirectToAction("Index",new{@appName=appName});
         }
-
         [HttpPost]
         public ActionResult InsertRow(string appName, string tableName, FormCollection fc)
         {
@@ -262,7 +264,7 @@ namespace FSPOC2.Controllers
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            DBItem row=new DBItem();            
+            DBItem row = new DBItem();
             foreach (DBColumn c in table.columns)
             {
                 row[c.Name] = fc.Get("col" + c.Name);
@@ -270,23 +272,23 @@ namespace FSPOC2.Controllers
 
             table.Add(row);
             DBTable.SaveChanges();
-            return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
+            return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
         }
 
         [HttpPost]
-        public ActionResult DeleteOrUpdate(string appName, string tableName, FormCollection fs )
+        public ActionResult DeleteOrUpdate(string appName, string tableName, FormCollection fs)
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
             DBTable table = DBTable.GetTable(tableName);
-            DBItem row=new DBItem();
-            
+            DBItem row = new DBItem();
+
             foreach (DBColumn c in table.columns)
             {
                 row[c.Name] = fs.Get("col" + c.Name);
                 TempData.Remove(c.Name);
-                TempData.Add(c.Name,row[c.Name]);
+                TempData.Add(c.Name, row[c.Name]);
             }
             if (fs.Get("Update") != null)
             {
@@ -298,9 +300,9 @@ namespace FSPOC2.Controllers
                 table.Remove(row);
                 DBTable.SaveChanges();
 
-            return RedirectToAction("Data", new {@appName = appName, @tableName = tableName});
+                return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
             }
-            
+
         }
 
         [HttpPost]
@@ -322,6 +324,7 @@ namespace FSPOC2.Controllers
 
             return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
         }
+
         public JsonResult getTableColumns(string tableName, string appName)
         {
             DBTable.ApplicationName = appName;
