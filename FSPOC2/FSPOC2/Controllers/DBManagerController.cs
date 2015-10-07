@@ -40,7 +40,7 @@ namespace FSPOC2.Controllers
         {
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable.ApplicationName = appName;
-            
+
             return View();
         }
         [HttpPost]
@@ -52,7 +52,7 @@ namespace FSPOC2.Controllers
 
                 model.AppName = appName;
                 model.Create();
-                
+
                 DBTable.SaveChanges();
 
                 return RedirectToAction("Index", new { @appName = appName });
@@ -70,7 +70,7 @@ namespace FSPOC2.Controllers
             table.Drop();
             DBTable.SaveChanges();
 
-            return RedirectToAction("Index", new {@appName = appName});
+            return RedirectToAction("Index", new { @appName = appName });
 
         }
 
@@ -105,7 +105,7 @@ namespace FSPOC2.Controllers
                     {
                         if (c.Name == d.Name)
                         {
-                            table.columns.ModifyInDB(c.Name, c.type, c.allowColumnLength, c.maxLength, c.canBeNull, c.isPrimaryKey, c.isUnique, c.additionalOptions);
+                            table.columns.ModifyInDB(c.Name, c.type, c.allowColumnLength, c.maxLength, c.canBeNull, c.isUnique, c.additionalOptions);
                             isEqual = true;
                             break;
                         }
@@ -113,7 +113,7 @@ namespace FSPOC2.Controllers
                     }
                     if (isEqual == false)
                     {
-                        table.columns.AddToDB(c.Name, c.type, c.allowColumnLength, c.maxLength, c.canBeNull, c.isPrimaryKey, c.isUnique, c.additionalOptions);
+                        table.columns.AddToDB(c.Name, c.type, c.allowColumnLength, c.maxLength, c.canBeNull, c.isUnique, c.additionalOptions);
                     }
 
                 }
@@ -131,7 +131,7 @@ namespace FSPOC2.Controllers
         {
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable.ApplicationName = appName;
-            
+
             DBTable.GetTable(tableName)
                 .columns.DropFromDB(columnName);
             DBTable.SaveChanges();
@@ -143,11 +143,11 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-            
+
             return View(table);
         }
-         [HttpPost]
-        public ActionResult AddIndex(string appName, string tableName,FormCollection fc, List<string> indexColumns)
+        [HttpPost]
+        public ActionResult AddIndex(string appName, string tableName, FormCollection fc, List<string> indexColumns)
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
@@ -156,7 +156,7 @@ namespace FSPOC2.Controllers
             table.indices.AddToDB(fc["indexName"], indexColumns);
             DBTable.SaveChanges();
 
-            return RedirectToAction("Index", new {@appName=appName});
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult DropIndex(string appName, string tableName)
@@ -166,7 +166,7 @@ namespace FSPOC2.Controllers
             DBTable table = DBTable.GetTable(tableName);
             return View(table);
         }
-         [HttpPost]
+        [HttpPost]
         public ActionResult DeleteIndex(string appName, string tableName, string indexName)
         {
             DBTable.ApplicationName = appName;
@@ -176,7 +176,7 @@ namespace FSPOC2.Controllers
             table.indices.DropFromDB(indexName);
             DBTable.SaveChanges();
 
-            return RedirectToAction("Index", new {@appName = appName});
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult CreateForeignKey(string appName, string tableName)
@@ -184,12 +184,12 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-            
+
             ViewBag.Columns = table.columns.Select(x => x.Name);
 
             return View(new DBForeignKey() { sourceTable = tableName });
         }
-         [HttpPost]
+        [HttpPost]
         public ActionResult AddForeignKey(string appName, string tableName, DBForeignKey model)
         {
             DBTable.ApplicationName = appName;
@@ -200,7 +200,7 @@ namespace FSPOC2.Controllers
 
             DBTable.SaveChanges();
 
-            return RedirectToAction("Index", new {@appName = appName});
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult DropForeignKey(string appName, string tableName)
@@ -208,7 +208,7 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-            
+
             return View(table);
         }
 
@@ -221,7 +221,7 @@ namespace FSPOC2.Controllers
             table.foreignKeys.DropFromDB(foreignKeyName);
             DBTable.SaveChanges();
 
-            return RedirectToAction("Index", new {@appName = appName});
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult CreatePrimaryKey(string appName, string tableName)
@@ -229,7 +229,7 @@ namespace FSPOC2.Controllers
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-            
+
             ViewBag.Columns = table.columns.Select(x => x.Name);
             return View(table);
         }
@@ -244,7 +244,7 @@ namespace FSPOC2.Controllers
             table.AddPrimaryKey(primaryKeys);
             DBTable.SaveChanges();
 
-            return RedirectToAction("Index", new {@appName = appName});
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult DropPrimaryKey(string appName, string tableName)
@@ -255,7 +255,7 @@ namespace FSPOC2.Controllers
 
             table.DropPrimaryKey();
             DBTable.SaveChanges();
-            return RedirectToAction("Index",new{@appName=appName});
+            return RedirectToAction("Index", new { @appName = appName });
         }
         [HttpPost]
         public ActionResult InsertRow(string appName, string tableName, FormCollection fc)

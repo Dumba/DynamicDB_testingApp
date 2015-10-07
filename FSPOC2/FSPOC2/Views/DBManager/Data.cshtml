@@ -14,7 +14,7 @@
         <tr>
             @foreach (DBColumn c1 in @Model.columns)
             {
-                <th>@c1.Name (@c1.type [@c1.maxLength])</th>
+                <th>@c1.Name (@c1.type [ @c1.maxLength])</th>
             }
             <th>Actions</th>
         </tr>
@@ -48,7 +48,7 @@
             {
                 foreach (DBColumn c3 in @Model.columns)
                 {
-                    <td>@Html.TextBox("valueOf" + c3.Name)</td>
+                    <td>@Html.TextBox("col" + c3.Name)</td>
                 }
                 <td>
                     <button type="submit" class="btn-primary btn">Insert</button>
@@ -58,3 +58,4 @@
         </tr>
     </tbody>
 </table>
+@Html.ActionLink("Back", "Index", "DBManager",new{@appName=Model.AppName} , new { @class = "btn btn-default" })

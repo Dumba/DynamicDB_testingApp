@@ -63,7 +63,6 @@
                                 <th>Max Length:</th>
                                 <th>Unique:</th>
                                 <th>Nullable:</th>
-                                <th>Primary Key:</th>
                                 @*<th>Identity:</th>
                                 <th>Default Value:</th>
                                 <th>Index:</th>*@
@@ -82,7 +81,6 @@
                                 <td>@Html.TextBoxFor(x => x.columns[0].maxLength, new { @disabled = true })</td>
                                 <td>@Html.CheckBoxFor(x => x.columns[0].isUnique, new { @disabled = true })</td>
                                 <td>@Html.CheckBoxFor(x => x.columns[0].canBeNull, new { @disabled = true })</td>
-                                <td>@Html.CheckBoxFor(x => x.columns[0].isPrimaryKey, new { @disabled = true })</td>
                                 @*<td>@Html.CheckBox("columnIdentity1", new {@disabled=true})</td>
     <td>@Html.TextBox("columnDefVal1", new {@disabled=true})</td>
     <td>@Html.CheckBox("columnIndex1", new {@disabled=true})</td>*@
