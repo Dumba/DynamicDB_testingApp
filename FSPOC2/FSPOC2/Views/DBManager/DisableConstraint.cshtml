@@ -1,0 +1,32 @@
+﻿@using System.EnterpriseServices
+@model Entitron.DBTable
+@{
+    ViewBag.Title = "DisableConstraint";
+}
+
+<h2>DisableConstraint</h2>
+
+@using (Html.BeginForm("DisableCon", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
+{
+    <table class="table table-responsive table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Disabled All Table Constraint</th>
+                <th>Disabled Single Constraint</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><button class="btn btn-primary" type="submit" name="all">Disabled All</button></td>
+            <td>@Html.DropDownList("constraintName", new SelectList(ViewBag.Constraints))</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <button class="btn btn-primary" type="submit">Disabled single</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+}
+@Html.ActionLink("Back","Index",new{@appName=Model.AppName}, new{@class="btn btn-default"})

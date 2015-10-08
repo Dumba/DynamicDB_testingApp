@@ -5,12 +5,18 @@
 }
 
 <h2>Index</h2>
-
+@if (TempData["message-success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        @TempData["message-success"]
+    </div>
+}
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Table Name</th>
-            <th colspan="8">Actions</th>
+            <th colspan="9">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -25,11 +31,14 @@
                 <td>@Html.ActionLink("AddPrimaryKey", "CreatePrimaryKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("DropPrimaryKey", "DropPrimaryKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("AddForeignKey", "CreateForeignKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("DropForeignKey", "DropForeignKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropForeignKey", "DropForeignKey", new {@appName = item.AppName, @tableName = item.tableName})</td>
+                <td>@Html.ActionLink("DisableConstraints", "DisableConstraint", new { @appName = item.AppName, @tableName = item.tableName })</td>
             </tr>
         }
     </tbody>
 </table>
 
-@Html.ActionLink("Create new", "Create", new { @appName = Request["appName"] })
+@Html.ActionLink("Create new", "Create", new { @appName = Request["appName"] }, new{@class="btn btn-primary"})
+@Html.ActionLink("Back", "Index", "Home", new { @appName = Request["appName"] }, new { @class = "btn btn-default" })
+
 

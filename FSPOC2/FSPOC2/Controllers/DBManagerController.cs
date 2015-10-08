@@ -70,6 +70,8 @@ namespace FSPOC2.Controllers
             table.Drop();
             DBTable.SaveChanges();
 
+            TempData["message-success"] = "Tabulka " + tableName + " byla úspěšně odstraněna";
+
             return RedirectToAction("Index", new { @appName = appName });
 
         }
@@ -255,6 +257,9 @@ namespace FSPOC2.Controllers
 
             table.DropPrimaryKey();
             DBTable.SaveChanges();
+
+            TempData["message-success"] = "Primární klíč tabulky " + tableName + " byl úspěšně odstraněn.";
+
             return RedirectToAction("Index", new { @appName = appName });
         }
         [HttpPost]
@@ -323,6 +328,29 @@ namespace FSPOC2.Controllers
             DBTable.SaveChanges();
 
             return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
+        }
+
+        public ActionResult DisableConstraint(string appName, string tableName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            ViewBag.Constraints = table.getConstraints();
+            return View(table);
+        }
+
+        public ActionResult DisableCon(string appName, string tableName, FormCollection fc)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
+            table.DisableConstraint(constraintName);
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Index", new{@appName=appName});
         }
 
         public JsonResult getTableColumns(string tableName, string appName)

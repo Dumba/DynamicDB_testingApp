@@ -305,6 +305,7 @@
     <Content Include="Views\DBManager\CreatePrimaryKey.cshtml" />
     <Content Include="Views\DBManager\DropForeignKey.cshtml" />
     <Content Include="Views\DBManager\UpdateView.cshtml" />
+    <Content Include="Views\DBManager\DisableConstraint.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
