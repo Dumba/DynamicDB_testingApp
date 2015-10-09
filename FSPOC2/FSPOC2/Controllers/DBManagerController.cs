@@ -57,6 +57,7 @@ namespace FSPOC2.Controllers
 
                 return RedirectToAction("Index", new { @appName = appName });
             }
+            TempData["message-success"] = "Table " + model.tableName + " was create successfuly.";
 
             return View(model);
         }
@@ -70,7 +71,7 @@ namespace FSPOC2.Controllers
             table.Drop();
             DBTable.SaveChanges();
 
-            TempData["message-success"] = "Tabulka " + tableName + " byla úspěšně odstraněna";
+            TempData["message-success"] = "Table " + tableName + " was drop successfuly.";
 
             return RedirectToAction("Index", new { @appName = appName });
 
@@ -107,7 +108,7 @@ namespace FSPOC2.Controllers
                     {
                         if (c.Name == d.Name)
                         {
-                            table.columns.ModifyInDB(c.Name, c.type, c.allowColumnLength, c.maxLength, c.canBeNull, c.isUnique, c.additionalOptions);
+                            table.columns.ModifyInDB(c.Name, c.type, c.allowColumnLength, c.allowPrecisionScale, c.maxLength, c.precision, c.scale, c.canBeNull, c.isUnique, c.additionalOptions);
                             isEqual = true;
                             break;
                         }
@@ -115,12 +116,13 @@ namespace FSPOC2.Controllers
                     }
                     if (isEqual == false)
                     {
-                        table.columns.AddToDB(c.Name, c.type, c.allowColumnLength, c.maxLength, c.canBeNull, c.isUnique, c.additionalOptions);
+                        table.columns.AddToDB(c.Name, c.type, c.allowColumnLength, c.allowPrecisionScale, c.maxLength, c.precision, c.scale, c.canBeNull, c.isUnique, c.additionalOptions);
                     }
 
                 }
 
                 DBTable.SaveChanges();
+                TempData["message-success"] = "Table " + tableName + " was alter successfuly.";
 
                 return RedirectToAction("Index", new { @appName = appName });
             }
@@ -158,6 +160,8 @@ namespace FSPOC2.Controllers
             table.indices.AddToDB(fc["indexName"], indexColumns);
             DBTable.SaveChanges();
 
+            TempData["message-success"] = "Index " + fc["indexName"] + " was create successfuly.";
+
             return RedirectToAction("Index", new { @appName = appName });
         }
 
@@ -177,7 +181,7 @@ namespace FSPOC2.Controllers
 
             table.indices.DropFromDB(indexName);
             DBTable.SaveChanges();
-
+            TempData["message-success"] = "Index " + indexName + " was drop successfuly.";
             return RedirectToAction("Index", new { @appName = appName });
         }
 
@@ -201,6 +205,7 @@ namespace FSPOC2.Controllers
             table.foreignKeys.AddToDB(model);
 
             DBTable.SaveChanges();
+            TempData["message-success"] = "Foreign key " + model.name + " was create successfuly.";
 
             return RedirectToAction("Index", new { @appName = appName });
         }
@@ -222,6 +227,7 @@ namespace FSPOC2.Controllers
 
             table.foreignKeys.DropFromDB(foreignKeyName);
             DBTable.SaveChanges();
+            TempData["message-success"] = "Foreign key " + foreignKeyName + " was drop successfuly.";
 
             return RedirectToAction("Index", new { @appName = appName });
         }
@@ -245,6 +251,7 @@ namespace FSPOC2.Controllers
 
             table.AddPrimaryKey(primaryKeys);
             DBTable.SaveChanges();
+            TempData["message-success"] = "Primary key of table " + tableName + " was create successfuly.";
 
             return RedirectToAction("Index", new { @appName = appName });
         }
@@ -257,8 +264,7 @@ namespace FSPOC2.Controllers
 
             table.DropPrimaryKey();
             DBTable.SaveChanges();
-
-            TempData["message-success"] = "Primární klíč tabulky " + tableName + " byl úspěšně odstraněn.";
+            TempData["message-success"] = "Primary key of table " + tableName + " was drop successfuly.";
 
             return RedirectToAction("Index", new { @appName = appName });
         }
@@ -348,9 +354,33 @@ namespace FSPOC2.Controllers
 
             string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
             table.DisableConstraint(constraintName);
+
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new{@appName=appName});
+        }
+
+        public ActionResult EnableConstraint(string appName, string tableName)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            ViewBag.Constraints = table.getConstraints();
+            return View(table);
+        }
+
+        public ActionResult EnableCon(string appName, string tableName, FormCollection fc)
+        {
+            DBTable.ApplicationName = appName;
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable table = DBTable.GetTable(tableName);
+
+            string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
+            table.EnableConstraint(constraintName);
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         public JsonResult getTableColumns(string tableName, string appName)

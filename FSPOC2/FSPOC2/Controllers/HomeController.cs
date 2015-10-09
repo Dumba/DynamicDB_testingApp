@@ -32,9 +32,9 @@ namespace FSPOC2.Controllers
                 Entities e = new Entities();
 
                 SqlQuery_Simple_Table_Create sql = new SqlQuery_Simple_Table_Create(model.DbMetaTables);
-                sql.AddColumn("Id", "INT", false, canBeNull: false, additionalOptions: "IDENTITY")
-                    .AddColumn("Name", "NVARCHAR", true, maxLength: 50, canBeNull: false, additionalOptions: "UNIQUE")
-                    .AddColumn("tableId", "INT", false, canBeNull: true, additionalOptions: "UNIQUE")
+                sql.AddColumn("Id", "INT", false, false, canBeNull: false, additionalOptions: "IDENTITY")
+                    .AddColumn("Name", "NVARCHAR", true, false, maxLength: 50, canBeNull: false, additionalOptions: "UNIQUE")
+                    .AddColumn("tableId", "INT", false, false, canBeNull: true, additionalOptions: "UNIQUE")
                     .AddParameters("CONSTRAINT [PK_" + model.DbMetaTables + "] PRIMARY KEY ([Id])");
                 sql.Execute(e.Database.Connection.ConnectionString);
 
