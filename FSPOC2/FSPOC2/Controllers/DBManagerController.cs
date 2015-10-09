@@ -77,6 +77,18 @@ namespace FSPOC2.Controllers
 
         }
 
+        public ActionResult TruncateTable(string appName, string tableName)
+        {
+            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBTable.ApplicationName = appName;
+
+            DBTable table = DBTable.GetTable(tableName);
+            table.Truncate();
+            DBTable.SaveChanges();
+
+            return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
+        }
+
         public ActionResult AddColumn(string appName, string tableName)
         {
             return View(new DBColumn());
