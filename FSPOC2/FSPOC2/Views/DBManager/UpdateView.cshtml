@@ -12,7 +12,7 @@
 }
 
 <h2>UpdateView</h2>
-@using (Html.BeginForm("UpdateRow", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName}, FormMethod.Post, null))
+@using (Html.BeginForm("UpdateRow", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName}, FormMethod.Post, null))
 {
     <table class="table table-bordered table-responsive">
         <thead>

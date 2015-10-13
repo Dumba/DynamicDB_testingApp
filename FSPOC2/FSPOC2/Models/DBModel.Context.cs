@@ -31,6 +31,5 @@ namespace FSPOC2.Models
         public virtual DbSet<Input> Inputs { get; set; }
         public virtual DbSet<Output> Outputs { get; set; }
         public virtual DbSet<Workflow> Workflows { get; set; }
-        public virtual DbSet<Application> Applications { get; set; }
     }
 }

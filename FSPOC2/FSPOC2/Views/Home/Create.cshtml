@@ -1,5 +1,5 @@
-﻿@using FSPOC2.Models
-@model Application
+﻿@using Entitron
+@model DBApp
 @{
     ViewBag.Title = "Create";
     ViewBag.JS =
@@ -23,15 +23,11 @@
     <table>
         <tr>
             <th>Name:</th>
-            <td>@Html.TextBoxFor(app => app._Name)</td>
+            <td>@Html.TextBoxFor(app => app.Name)</td>
         </tr>
         <tr>
-            <th>Database tables prefix</th>
-            <td>@Html.TextBoxFor(app => app._DbTablePrefix)</td>
-        </tr>
-        <tr>
-            <th>Database table for metadata</th>
-            <td>@Html.TextBoxFor(app => app._DbMetaTables)</td>
+            <th>Display Name</th>
+            <td>@Html.TextBoxFor(app => app.DisplayName)</td>
         </tr>
     </table>
     <button>Create</button>

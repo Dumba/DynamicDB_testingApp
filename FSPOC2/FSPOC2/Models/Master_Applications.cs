@@ -12,11 +12,10 @@ namespace FSPOC2.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Application
+    public partial class Master_Applications
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string DbTablePrefix { get; set; }
-        public string DbMetaTables { get; set; }
+        public string DisplayName { get; set; }
     }
 }

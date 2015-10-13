@@ -45,7 +45,7 @@
     </script>
     <h2>Detail</h2>
 
-    @using (Html.BeginForm("AlterTable", "DBManager", new { @appName = Model.AppName }, FormMethod.Post, null))
+    @using (Html.BeginForm("AlterTable", "DBManager", new { @appName = Model.Application.Name }, FormMethod.Post, null))
     {
 
         <table class="table table-bordered" id="mytable">
@@ -81,6 +81,6 @@
         </table>
 
 <button type="submit">Alter Table</button>
-@Html.ActionLink("Back", "Index", new { @appName = Model.AppName })
+@Html.ActionLink("Back", "Index", new { @appName = Model.Application.Name })
 
 }

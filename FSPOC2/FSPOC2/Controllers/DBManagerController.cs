@@ -13,64 +13,71 @@ namespace FSPOC2.Controllers
     {
         public ActionResult Index(string appName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            List<DBTable> tables = DBTable.GetAll();
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
-            return View(tables);
+            return View(app.GetTables());
         }
         public ActionResult Details(string appName, string tableName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
-
-            return View(table);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            
+            return View(app.GetTable(tableName));
         }
         public ActionResult Data(string appName, string tableName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
-            DBTable table = DBTable.GetTable(tableName);
-            return View(table);
+            return View(app.GetTable(tableName));
         }
 
         public ActionResult Create(string appName)
         {
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable.ApplicationName = appName;
-
-            return View();
+            return View(new DBTable() { Application = new DBApp() { Name = appName } });
         }
         [HttpPost]
         public ActionResult Create(string appName, DBTable model)
         {
             if (!string.IsNullOrWhiteSpace(model.tableName))
             {
-                DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+                DBApp app = new DBApp()
+                {
+                    Name = appName,
+                    ConnectionString = (new Entities()).Database.Connection.ConnectionString
+                };
 
-                model.AppName = appName;
+                model.Application = app;
                 model.Create();
 
-                DBTable.SaveChanges();
+                app.SaveChanges();
 
                 return RedirectToAction("Index", new { @appName = appName });
             }
-            TempData["message-success"] = "Table " + model.tableName + " was create successfuly.";
 
             return View(model);
         }
 
         public ActionResult DropTable(string appName, string tableName)
         {
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable.ApplicationName = appName;
-            DBTable table = DBTable.GetTable(tableName);
-            table.Drop();
-            DBTable.SaveChanges();
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
-            TempData["message-success"] = "Table " + tableName + " was drop successfuly.";
+            app.GetTable(tableName).Drop();
+            app.SaveChanges();
 
             return RedirectToAction("Index", new { @appName = appName });
 
@@ -78,12 +85,15 @@ namespace FSPOC2.Controllers
 
         public ActionResult TruncateTable(string appName, string tableName)
         {
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable.ApplicationName = appName;
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
-            DBTable table = DBTable.GetTable(tableName);
+            DBTable table = app.GetTable(tableName);
             table.Truncate();
-            DBTable.SaveChanges();
+            app.SaveChanges();
 
             return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
         }
@@ -95,11 +105,15 @@ namespace FSPOC2.Controllers
         [HttpPost]
         public ActionResult AddColumn(string appName, string tableName, DBColumn column)
         {
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable.ApplicationName = appName;
-            DBTable.GetTable(tableName)
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            app.GetTable(tableName)
                 .columns.AddToDB(column);
-            DBTable.SaveChanges();
+            app.SaveChanges();
+
             return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
         }
 
@@ -108,9 +122,13 @@ namespace FSPOC2.Controllers
         {
             if (!string.IsNullOrWhiteSpace(tableName))
             {
-                DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-                DBTable.ApplicationName = appName;
-                DBTable table = DBTable.GetTable(tableName);
+                DBApp app = new DBApp()
+                {
+                    Name = appName,
+                    ConnectionString = (new Entities()).Database.Connection.ConnectionString
+                };
+
+                DBTable table = app.GetTable(tableName);
                 bool isEqual;
                 foreach (DBColumn c in model.columns)
                 {
@@ -132,8 +150,7 @@ namespace FSPOC2.Controllers
 
                 }
 
-                DBTable.SaveChanges();
-                TempData["message-success"] = "Table " + tableName + " was alter successfuly.";
+                app.SaveChanges();
 
                 return RedirectToAction("Index", new { @appName = appName });
             }
@@ -144,110 +161,140 @@ namespace FSPOC2.Controllers
 
         public ActionResult DropColumn(string appName, string tableName, string columnName)
         {
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable.ApplicationName = appName;
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
-            DBTable.GetTable(tableName)
+            app.GetTable(tableName)
                 .columns.DropFromDB(columnName);
-            DBTable.SaveChanges();
+            app.SaveChanges();
+
             return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
         }
 
         public ActionResult CreateIndex(string appName, string tableName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
-
-            return View(table);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            
+            return View(app.GetTable(tableName));
         }
         [HttpPost]
         public ActionResult AddIndex(string appName, string tableName, FormCollection fc, List<string> indexColumns)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
-            DBTable table = DBTable.GetTable(tableName);
+            DBTable table = app.GetTable(tableName);
             table.indices.AddToDB(fc["indexName"], indexColumns);
-            DBTable.SaveChanges();
-
-            TempData["message-success"] = "Index " + fc["indexName"] + " was create successfuly.";
+            app.SaveChanges();
 
             return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult DropIndex(string appName, string tableName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+
+            DBTable table = app.GetTable(tableName);
             return View(table);
         }
         [HttpPost]
         public ActionResult DeleteIndex(string appName, string tableName, string indexName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+
+            DBTable table = app.GetTable(tableName);
 
             table.indices.DropFromDB(indexName);
-            DBTable.SaveChanges();
-            TempData["message-success"] = "Index " + indexName + " was drop successfuly.";
+            app.SaveChanges();
+
             return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult CreateForeignKey(string appName, string tableName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+
+            DBTable table = app.GetTable(tableName);
 
             ViewBag.Columns = table.columns.Select(x => x.Name);
 
-            return View(new DBForeignKey() { sourceTable = tableName });
+            return View(new DBForeignKey() { sourceTable = table });
         }
         [HttpPost]
         public ActionResult AddForeignKey(string appName, string tableName, DBForeignKey model)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+
+            DBTable table = app.GetTable(tableName);
 
             table.foreignKeys.AddToDB(model);
 
-            DBTable.SaveChanges();
-            TempData["message-success"] = "Foreign key " + model.name + " was create successfuly.";
+            app.SaveChanges();
 
             return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult DropForeignKey(string appName, string tableName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
 
             return View(table);
         }
 
         public ActionResult DeleteForeignKey(string appName, string tableName, string foreignKeyName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
 
             table.foreignKeys.DropFromDB(foreignKeyName);
-            DBTable.SaveChanges();
-            TempData["message-success"] = "Foreign key " + foreignKeyName + " was drop successfuly.";
+            app.SaveChanges();
 
             return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult CreatePrimaryKey(string appName, string tableName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
 
             ViewBag.Columns = table.columns.Select(x => x.Name);
             return View(table);
@@ -256,54 +303,66 @@ namespace FSPOC2.Controllers
         [HttpPost]
         public ActionResult AddPrimaryKey(string appName, string tableName, List<string> primaryKeys)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
 
             table.AddPrimaryKey(primaryKeys);
-            DBTable.SaveChanges();
-            TempData["message-success"] = "Primary key of table " + tableName + " was create successfuly.";
+            app.SaveChanges();
 
             return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult DropPrimaryKey(string appName, string tableName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
 
             table.DropPrimaryKey();
-            DBTable.SaveChanges();
-            TempData["message-success"] = "Primary key of table " + tableName + " was drop successfuly.";
-
+            app.SaveChanges();
             return RedirectToAction("Index", new { @appName = appName });
         }
         [HttpPost]
         public ActionResult InsertRow(string appName, string tableName, FormCollection fc)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
-            DBTable table = DBTable.GetTable(tableName);
+            DBTable table = app.GetTable(tableName);
             DBItem row = new DBItem();
             foreach (DBColumn c in table.columns)
             {
-                row[c.Name] = fc.Get("col" + c.Name);
+                if (c.type.ToLower() == "int")
+                    row[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
+                else
+                    row[c.Name] = fc.Get("col" + c.Name);
             }
 
             table.Add(row);
-            DBTable.SaveChanges();
+            app.SaveChanges();
             return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
         }
 
         [HttpPost]
         public ActionResult DeleteOrUpdate(string appName, string tableName, FormCollection fs)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
-            DBTable table = DBTable.GetTable(tableName);
+            DBTable table = app.GetTable(tableName);
             DBItem row = new DBItem();
 
             foreach (DBColumn c in table.columns)
@@ -320,7 +379,7 @@ namespace FSPOC2.Controllers
             else
             {
                 table.Remove(row);
-                DBTable.SaveChanges();
+                app.SaveChanges();
 
                 return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
             }
@@ -330,9 +389,12 @@ namespace FSPOC2.Controllers
         [HttpPost]
         public ActionResult UpdateRow(string appName, string tableName, FormCollection fc)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
             DBItem changes = new DBItem();
             DBItem oldVal = new DBItem();
 
@@ -342,16 +404,20 @@ namespace FSPOC2.Controllers
                 oldVal[c.Name] = TempData[c.Name];
             }
             table.Update(changes, oldVal);
-            DBTable.SaveChanges();
+            app.SaveChanges();
 
             return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
         }
 
         public ActionResult Constraint(string appName, string tableName, bool isDisable)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
+
             ViewBag.Constraints = table.getConstraints();
 
             if (isDisable == true)
@@ -368,9 +434,12 @@ namespace FSPOC2.Controllers
 
         public ActionResult DisableOrEnableConstraint(string appName, string tableName, FormCollection fc, bool isDisable)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
 
             string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
             if (isDisable == true)
@@ -382,9 +451,9 @@ namespace FSPOC2.Controllers
                 table.EnableConstraint(constraintName);
             }
 
-            DBTable.SaveChanges();
+            app.SaveChanges();
 
-            return RedirectToAction("Index", new{@appName=appName});
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         //public ActionResult EnableConstraint(string appName, string tableName)
@@ -392,7 +461,6 @@ namespace FSPOC2.Controllers
         //    DBTable.ApplicationName = appName;
         //    DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
         //    DBTable table = DBTable.GetTable(tableName);
-
         //    ViewBag.Constraints = table.getConstraints();
         //    return View(table);
         //}
@@ -412,10 +480,13 @@ namespace FSPOC2.Controllers
 
         public JsonResult getTableColumns(string tableName, string appName)
         {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
-            DBTable table = DBTable.GetTable(tableName);
+            DBTable table = app.GetTable(tableName);
             List<string> tableColumns = table.columns.Select(x => x.Name).ToList();
 
             return Json(tableColumns, JsonRequestBehavior.AllowGet);

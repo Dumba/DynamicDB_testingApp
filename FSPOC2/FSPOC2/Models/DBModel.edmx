@@ -25,15 +25,6 @@
           <Property Name="PositionY" Type="int" Nullable="false" />
           <Property Name="Commit_Id" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="Applications">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="DbTablePrefix" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="DbMetaTables" Type="nvarchar" MaxLength="50" Nullable="false" />
-        </EntityType>
         <EntityType Name="Commits">
           <Key>
             <PropertyRef Name="Id" />
@@ -130,7 +121,6 @@
         <EntityContainer Name="ModelStoreContainer">
           <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Activities" EntityType="Self.Activities" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Applications" EntityType="Self.Applications" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Commits" EntityType="Self.Commits" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Inputs" EntityType="Self.Inputs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Outputs" EntityType="Self.Outputs" Schema="dbo" store:Type="Tables" />
@@ -300,17 +290,7 @@
             <End Role="Workflows" EntitySet="Workflows" />
             <End Role="Commits" EntitySet="Commits" />
           </AssociationSet>
-          <EntitySet Name="Applications" EntityType="Model.Application" />
           </EntityContainer>
-        <EntityType Name="Application">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DbTablePrefix" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="DbMetaTables" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -376,16 +356,6 @@
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="CreationTime" ColumnName="CreationTime" />
                 <ScalarProperty Name="LastChangeTime" ColumnName="LastChangeTime" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Applications">
-            <EntityTypeMapping TypeName="Model.Application">
-              <MappingFragment StoreEntitySet="Applications">
-                <ScalarProperty Name="DbMetaTables" ColumnName="DbMetaTables" />
-                <ScalarProperty Name="DbTablePrefix" ColumnName="DbTablePrefix" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

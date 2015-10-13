@@ -35,7 +35,7 @@
         <tbody>
             <tr>
                 <td>@Model.sourceTable @Html.HiddenFor(fk => fk.sourceTable)</td>
-                <td>@Html.DropDownListFor(fk => fk.targetTable, new SelectList(DBTable.GetAll().Select(t => t.tableName)))</td>
+                <td>@Html.DropDownListFor(fk => fk.targetTable, new SelectList(Model.targetTable.Application.GetTables().Select(t => t.tableName)))</td>
             </tr>
             <tr>
                 <td>@Html.DropDownListFor(fk => fk.sourceColumn, new SelectList(ViewBag.Columns))</td>
