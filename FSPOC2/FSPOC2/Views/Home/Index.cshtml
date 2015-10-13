@@ -1,14 +1,14 @@
-﻿@using FSPOC2.Models;
-@model List<Application>
+﻿@using Entitron;
+@model IEnumerable<DBApp>
 @{
     ViewBag.Title = "FSPOC 2.0";
 }
 
 <h2>Apps</h2>
 <ul>
-    @foreach(Application app in Model)
+    @foreach(DBApp app in Model)
     {
-        <li>@Html.ActionLink(app.Name, "Index", "DBManager", new { @appName = app.Name }, null)</li>
+        <li>@Html.ActionLink(app.DisplayName, "Index", "DBManager", new { @appName = app.Name }, null)</li>
     }
 </ul>
 

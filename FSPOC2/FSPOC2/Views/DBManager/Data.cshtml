@@ -11,52 +11,52 @@
 
 <table class="table table-bordered table-hover table-responsive table-condensed">
     <thead>
-    <tr>
-        @foreach (DBColumn c1 in @Model.columns)
-        {
-            <th>@c1.Name (@c1.type [ @c1.maxLength])</th>
-        }
-        <th>Actions</th>
-    </tr>
+        <tr>
+            @foreach (DBColumn c1 in @Model.columns)
+            {
+                <th>@c1.Name (@c1.type [ @c1.maxLength])</th>
+            }
+            <th>Actions</th>
+        </tr>
     </thead>
     <tbody id="field">
-    @foreach (DBItem i in @Model.Select().ToList())
-    {
-        <tr>
-            @using (Html.BeginForm("DeleteOrUpdate", "DBManager", new {@appName = Model.AppName, @tableName = Model.tableName}, FormMethod.Post, null))
-            {
-                foreach (DBColumn c2 in @Model.columns)
+        @foreach (DBItem i in @Model.Select().ToList())
+        {
+            <tr>
+                @using (Html.BeginForm("DeleteOrUpdate", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, FormMethod.Post, null))
                 {
-                    <td>
-                        @Html.Hidden("col" + c2.Name, i[c2.Name])
-                        <p class="form-control-static"> @i[c2.Name]</p>
-                        @{
-                            row[c2.Name] = i[c2.Name];
-                        }
+                    foreach (DBColumn c2 in @Model.columns)
+                    {
+                        <td>
+                            @Html.Hidden("col" + c2.Name, i[c2.Name])
+                            <p class="form-control-static"> @i[c2.Name]</p>
+                            @{
+                        row[c2.Name] = i[c2.Name];
+                            }
+                        </td>
+                       
+                    }
+                    <td id="btnContent">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                        <button type="submit" name="Update" class="btn-success btn">Update</button>
                     </td>
-
                 }
-                <td id="btnContent">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                    <button type="submit" name="Update" class="btn-success btn">Update</button>
+            </tr>
+        }
+        <tr>
+            @using (Html.BeginForm("InsertRow", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, FormMethod.Post, null))
+            {
+                foreach (DBColumn c3 in @Model.columns)
+                {
+                    <td>@Html.TextBox("col" + c3.Name)</td>
+                }
+                <td>
+                    <button type="submit" class="btn-primary btn">Insert</button>
                 </td>
             }
-        </tr>
-    }
-    <tr>
-        @using (Html.BeginForm("InsertRow", "DBManager", new {@appName = Model.AppName, @tableName = Model.tableName}, FormMethod.Post, null))
-        {
-            foreach (DBColumn c3 in @Model.columns)
-            {
-                <td>@Html.TextBox("col" + c3.Name)</td>
-            }
-            <td>
-                <button type="submit" class="btn-primary btn">Insert</button>
-            </td>
-        }
 
-    </tr>
+        </tr>
     </tbody>
 </table>
-@Html.ActionLink("Truncate Table", "TruncateTable", "DBManager", new{@appName=Model.AppName,@tableName=Model.tableName}, new{@class="btn btn-danger"})
-@Html.ActionLink("Back", "Index", "DBManager",new{@appName=Model.AppName} , new { @class = "btn btn-default" })
+@Html.ActionLink("Truncate Table", "TruncateTable", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, new { @class = "btn btn-danger" })
+@Html.ActionLink("Back", "Index", "DBManager",new{@appName=Model.Application.Name } , new { @class = "btn btn-default" })

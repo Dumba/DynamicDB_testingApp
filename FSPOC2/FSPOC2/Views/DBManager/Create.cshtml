@@ -80,7 +80,7 @@
                                         }
                                     </select>
                                 </td>
-                                <td>@Html.TextBoxFor(x => x.columns[0].maxLength, new {@disabled = true})</td>
+                                <td>@Html.TextBoxFor(x => x.columns[0].maxLength, new { @disabled = true })</td>
                                 <td>@Html.TextBoxFor(x => x.columns[0].precision, new { @disabled = true })</td>
                                 <td>@Html.TextBoxFor(x => x.columns[0].scale, new { @disabled = true })</td>       @*It needs to set columns named maxlenght, precision and scale it appears only on the right types. String types(getMaxLenghtDataTypes()) have maxlenght, decimal have precision and scale and float have only precision*@
                                 <td>@Html.CheckBoxFor(x => x.columns[0].isUnique, new { @disabled = true })</td>

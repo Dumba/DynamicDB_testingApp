@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using FSPOC2.Models;
-using Entitron.Sql;
+using Entitron;
 
 namespace FSPOC2.Controllers
 {
@@ -10,41 +10,28 @@ namespace FSPOC2.Controllers
     {
         public ActionResult Index()
         {
-            Entities e = new Entities();
-            List<Application> apps = e.Applications.ToList();
+            DBApp.connectionString = (new Entities()).Database.Connection.ConnectionString;
 
-            return View(apps);
+            return View(DBApp.GetAll());
         }
 
         public ActionResult Create()
         {
-            return View(new Application()
-            {
-                DbTablePrefix = "Dynamic_",
-                DbMetaTables = "Dynamic__Metadata_tables"
-            });
+            return View();
         }
         [HttpPost]
-        public ActionResult Create(Application model)
+        public ActionResult Create(DBApp model)
         {
-            if (ModelState.IsValid)
-            {
-                Entities e = new Entities();
+            if (string.IsNullOrWhiteSpace(model.Name))
+                return View(model);
 
-                SqlQuery_Simple_Table_Create sql = new SqlQuery_Simple_Table_Create(model.DbMetaTables);
-                sql.AddColumn("Id", "INT", false, false, canBeNull: false, additionalOptions: "IDENTITY")
-                    .AddColumn("Name", "NVARCHAR", true, false, maxLength: 50, canBeNull: false, additionalOptions: "UNIQUE")
-                    .AddColumn("tableId", "INT", false, false, canBeNull: true, additionalOptions: "UNIQUE")
-                    .AddParameters("CONSTRAINT [PK_" + model.DbMetaTables + "] PRIMARY KEY ([Id])");
-                sql.Execute(e.Database.Connection.ConnectionString);
+            DBApp.connectionString = (new Entities()).Database.Connection.ConnectionString;
+            if (string.IsNullOrWhiteSpace(model.DisplayName))
+                model.DisplayName = model.Name;
+            
+            model.Create();
 
-                e.Applications.Add(model);
-                e.SaveChanges();
-
-                return RedirectToAction("Index");
-            }
-
-            return View(model);
+            return RedirectToAction("Index");
         }
     }
 }
