@@ -16,7 +16,7 @@
     <thead>
         <tr>
             <th>Table Name</th>
-            <th colspan="9">Actions</th>
+            <th colspan="10">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -32,7 +32,8 @@
                 <td>@Html.ActionLink("DropPrimaryKey", "DropPrimaryKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("AddForeignKey", "CreateForeignKey", new { @appName = item.AppName, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("DropForeignKey", "DropForeignKey", new {@appName = item.AppName, @tableName = item.tableName})</td>
-                <td>@Html.ActionLink("DisableConstraints", "DisableConstraint", new { @appName = item.AppName, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DisableConstraints", "Constraint", new {@appName = item.AppName, @tableName = item.tableName, @isDisable = true})</td>
+                <td>@Html.ActionLink("EnableConstraints", "Constraint", new { @appName = item.AppName, @tableName = item.tableName, @isDisable = false })</td>
             </tr>
         }
     </tbody>

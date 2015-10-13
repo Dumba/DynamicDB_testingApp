@@ -66,7 +66,6 @@ namespace FSPOC2.Controllers
         {
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable.ApplicationName = appName;
-
             DBTable table = DBTable.GetTable(tableName);
             table.Drop();
             DBTable.SaveChanges();
@@ -348,52 +347,68 @@ namespace FSPOC2.Controllers
             return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
         }
 
-        public ActionResult DisableConstraint(string appName, string tableName)
+        public ActionResult Constraint(string appName, string tableName, bool isDisable)
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
-
             ViewBag.Constraints = table.getConstraints();
-            return View(table);
+
+            if (isDisable == true)
+            {
+                 return View("DisableConstraint", table);
+            }
+            else if(isDisable==false)
+            {
+                return View("EnableConstraint", table);
+            }
+
+            return RedirectToAction("Index", new {@appName = appName});
         }
 
-        public ActionResult DisableCon(string appName, string tableName, FormCollection fc)
+        public ActionResult DisableOrEnableConstraint(string appName, string tableName, FormCollection fc, bool isDisable)
         {
             DBTable.ApplicationName = appName;
             DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
             DBTable table = DBTable.GetTable(tableName);
 
             string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
-            table.DisableConstraint(constraintName);
+            if (isDisable == true)
+            {
+                table.DisableConstraint(constraintName);
+            }
+            else if (isDisable==false)
+            {
+                table.EnableConstraint(constraintName);
+            }
 
             DBTable.SaveChanges();
 
             return RedirectToAction("Index", new{@appName=appName});
         }
 
-        public ActionResult EnableConstraint(string appName, string tableName)
-        {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+        //public ActionResult EnableConstraint(string appName, string tableName)
+        //{
+        //    DBTable.ApplicationName = appName;
+        //    DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+        //    DBTable table = DBTable.GetTable(tableName);
 
-            ViewBag.Constraints = table.getConstraints();
-            return View(table);
-        }
+        //    ViewBag.Constraints = table.getConstraints();
+        //    return View(table);
+        //}
 
-        public ActionResult EnableCon(string appName, string tableName, FormCollection fc)
-        {
-            DBTable.ApplicationName = appName;
-            DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-            DBTable table = DBTable.GetTable(tableName);
+        //public ActionResult EnableCon(string appName, string tableName, FormCollection fc)
+        //{
+        //    DBTable.ApplicationName = appName;
+        //    DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
+        //    DBTable table = DBTable.GetTable(tableName);
 
-            string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
-            table.EnableConstraint(constraintName);
-            DBTable.SaveChanges();
+        //    string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
+        //    table.EnableConstraint(constraintName);
+        //    DBTable.SaveChanges();
 
-            return RedirectToAction("Index", new { @appName = appName });
-        }
+        //    return RedirectToAction("Index", new { @appName = appName });
+        //}
 
         public JsonResult getTableColumns(string tableName, string appName)
         {

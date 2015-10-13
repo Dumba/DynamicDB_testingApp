@@ -6,7 +6,7 @@
 
 <h2>DisableConstraint</h2>
 
-@using (Html.BeginForm("DisableCon", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName }, FormMethod.Post, null))
+@using (Html.BeginForm("DisableOrEnableConstraint", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName, @isDisable = true }, FormMethod.Post, null))
 {
     <table class="table table-responsive table-bordered table-hover">
         <thead>
