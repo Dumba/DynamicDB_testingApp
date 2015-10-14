@@ -1,5 +1,6 @@
 ﻿@using Entitron
 @using System.Data
+@using Antlr.Runtime.Tree
 @model DBTable
 @{
     ViewBag.Title = "Create";
@@ -86,8 +87,7 @@
                                 <td>@Html.CheckBoxFor(x => x.columns[0].isUnique, new { @disabled = true })</td>
                                 <td>@Html.CheckBoxFor(x => x.columns[0].canBeNull, new { @disabled = true })</td>
                                 @*<td>@Html.CheckBox("columnIdentity1", new {@disabled=true})</td>
-    <td>@Html.TextBox("columnDefVal1", new {@disabled=true})</td>
-    <td>@Html.CheckBox("columnIndex1", new {@disabled=true})</td>*@
+    <td>@Html.TextBox("columnDefVal1", new {@disabled=true})</td>*@
                                 <td><button class="btn btn-danger btnRemoveColumn">Remove</button></td>
                             </tr>
                         </tbody>
@@ -102,7 +102,7 @@
         
     </table>
 
-            <button type="submit">Create</button>
-            @Html.ActionLink("Back", "Index", new { @appName = Request["appName"] })
+            <button type="submit" class="btn btn-primary">Create</button>
+            @Html.ActionLink("Back", "Index", new { @appName = Request["appName"] }, new{@class="btn btn-default"})
       
 }

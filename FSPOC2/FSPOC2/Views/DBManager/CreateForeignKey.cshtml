@@ -6,7 +6,7 @@
 }
 <script type="text/javascript">
     $(function () {
-        $(document).on('change', '#targetTable', function () {
+        $(document).on('change', '#targetTable_tableName', function () {
             $.getJSON('/DBManager/getTableColumns?appName=@(Request["appName"])&tableName=' + $(this).val(), function (data) {
                 $('#targetColumn').html('');
                 $.each(data, function (i, item) {
@@ -14,7 +14,7 @@
                 });
             });
         });
-        $('#targetTable').change();
+        $('#targetTable_tableName').change();
     });
 </script>
 <h2>CreateForeignKey</h2>
@@ -34,8 +34,8 @@
         </thead>
         <tbody>
             <tr>
-                <td>@Model.sourceTable @Html.HiddenFor(fk => fk.sourceTable)</td>
-                <td>@Html.DropDownListFor(fk => fk.targetTable, new SelectList(Model.targetTable.Application.GetTables().Select(t => t.tableName)))</td>
+                <td>@Model.sourceTable @Html.HiddenFor(fk => fk.sourceTable.tableName)</td>
+                <td>@Html.DropDownListFor(fk => fk.targetTable.tableName, new SelectList(ViewBag.tables))</td>
             </tr>
             <tr>
                 <td>@Html.DropDownListFor(fk => fk.sourceColumn, new SelectList(ViewBag.Columns))</td>

@@ -5,9 +5,12 @@
     ViewBag.Title = "Data";
     DBItem row = new DBItem();
 }
-
-<h2>Data tabulky @Model.tableName</h2>
-
+    <div class="col-sm-10">
+        <h2>Data tabulky @Model.tableName</h2>
+    </div>
+    <div class="pull-left" style="margin-top: 20px">
+        @Html.ActionLink("Truncate Table", "TruncateTable", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, new { @class = "btn btn-danger" })
+    </div>
 
 <table class="table table-bordered table-hover table-responsive table-condensed">
     <thead>
@@ -58,5 +61,4 @@
         </tr>
     </tbody>
 </table>
-@Html.ActionLink("Truncate Table", "TruncateTable", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, new { @class = "btn btn-danger" })
 @Html.ActionLink("Back", "Index", "DBManager",new{@appName=Model.Application.Name } , new { @class = "btn btn-default" })

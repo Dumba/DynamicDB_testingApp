@@ -44,7 +44,7 @@ namespace FSPOC2.Controllers
 
         public ActionResult Create(string appName)
         {
-            return View(new DBTable() { Application = new DBApp() { Name = appName } });
+            return View();
         }
         [HttpPost]
         public ActionResult Create(string appName, DBTable model)
@@ -57,7 +57,7 @@ namespace FSPOC2.Controllers
                     ConnectionString = (new Entities()).Database.Connection.ConnectionString
                 };
 
-                model.Application = app;
+                model.Application= app;
                 model.Create();
 
                 app.SaveChanges();
@@ -237,7 +237,7 @@ namespace FSPOC2.Controllers
             };
 
             DBTable table = app.GetTable(tableName);
-
+            ViewBag.tables = app.GetTables().Select(t => t.tableName);
             ViewBag.Columns = table.columns.Select(x => x.Name);
 
             return View(new DBForeignKey() { sourceTable = table });
@@ -254,7 +254,6 @@ namespace FSPOC2.Controllers
             DBTable table = app.GetTable(tableName);
 
             table.foreignKeys.AddToDB(model);
-
             app.SaveChanges();
 
             return RedirectToAction("Index", new { @appName = appName });
@@ -268,7 +267,7 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-
+            ViewBag.foreignKeys = table.foreignKeys;
             return View(table);
         }
 
@@ -420,11 +419,11 @@ namespace FSPOC2.Controllers
 
             ViewBag.Constraints = table.getConstraints();
 
-            if (isDisable == true)
+            if (isDisable)
             {
                  return View("DisableConstraint", table);
             }
-            else if(isDisable==false)
+            else
             {
                 return View("EnableConstraint", table);
             }
@@ -442,11 +441,11 @@ namespace FSPOC2.Controllers
             DBTable table = app.GetTable(tableName);
 
             string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
-            if (isDisable == true)
+            if (isDisable)
             {
                 table.DisableConstraint(constraintName);
             }
-            else if (isDisable==false)
+            else
             {
                 table.EnableConstraint(constraintName);
             }

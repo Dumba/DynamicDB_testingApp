@@ -10,7 +10,7 @@
         <thead>
             <tr>
                 <th>Název cizího klíče</th>
-                <td>@Html.DropDownList("foreignKeyName", new SelectList(Model.foreignKeys.Select(fk => fk.name), "Name"))</td>
+                <td>@Html.DropDownList("foreignKeyName", new SelectList(ViewBag.foreignKeys, "Name"))</td>
             </tr>
         </thead>
         <tbody></tbody>

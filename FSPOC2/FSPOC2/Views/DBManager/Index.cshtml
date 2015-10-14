@@ -23,17 +23,17 @@
         @foreach (DBTable item in Model)
         {
             <tr>
-                <td>@Html.ActionLink(item.tableName, "Data", new { @appName = item.Application, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("Manage", "Details", new { @appName = item.Application, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("DropTable", "DropTable", new { @appName = item.Application, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("CreateIndex", "CreateIndex", new { @appName = item.Application, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("DropIndex", "DropIndex", new { @appName = item.Application, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("AddPrimaryKey", "CreatePrimaryKey", new { @appName = item.Application, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("DropPrimaryKey", "DropPrimaryKey", new { @appName = item.Application, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("AddForeignKey", "CreateForeignKey", new { @appName = item.Application, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("DropForeignKey", "DropForeignKey", new { @appName = item.Application, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("DisableConstraints", "Constraint", new { @appName = item.Application, @tableName = item.tableName, @isDisable = true })</td>
-                <td>@Html.ActionLink("EnableConstraints", "Constraint", new { @appName = item.Application, @tableName = item.tableName, @isDisable = false })</td>
+                <td>@Html.ActionLink(item.tableName, "Data", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("Manage", "Details", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropTable", "DropTable", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("CreateIndex", "CreateIndex", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropIndex", "DropIndex", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("AddPrimaryKey", "CreatePrimaryKey", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropPrimaryKey", "DropPrimaryKey", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("AddForeignKey", "CreateForeignKey", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropForeignKey", "DropForeignKey", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DisableConstraints", "Constraint", new { @appName = item.Application.Name, @tableName = item.tableName, @isDisable = true })</td>
+                <td>@Html.ActionLink("EnableConstraints", "Constraint", new { @appName = item.Application.Name, @tableName = item.tableName, @isDisable = false })</td>
             </tr>
         }
     </tbody>
