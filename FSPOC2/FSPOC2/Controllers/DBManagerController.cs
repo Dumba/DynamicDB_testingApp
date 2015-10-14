@@ -267,7 +267,7 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            ViewBag.foreignKeys = table.foreignKeys;
+            ViewBag.foreignKeys = table.foreignKeys.Select(x=>x.name);
             return View(table);
         }
 
@@ -416,8 +416,7 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-
-            ViewBag.Constraints = table.getConstraints();
+            ViewBag.Constraints = table.getConstraints(isDisable);
 
             if (isDisable)
             {
@@ -427,10 +426,9 @@ namespace FSPOC2.Controllers
             {
                 return View("EnableConstraint", table);
             }
-
-            return RedirectToAction("Index", new {@appName = appName});
         }
 
+        [HttpPost]
         public ActionResult DisableOrEnableConstraint(string appName, string tableName, FormCollection fc, bool isDisable)
         {
             DBApp app = new DBApp()

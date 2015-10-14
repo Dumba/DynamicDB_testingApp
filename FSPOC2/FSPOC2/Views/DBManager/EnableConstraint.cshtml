@@ -5,27 +5,27 @@
 
 <h2>EnableConstraint</h2>
 
-@using (Html.BeginForm("DisableOrEnableConstraint", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName, @isDisable=false }, FormMethod.Post, null))
+@using (Html.BeginForm("DisableOrEnableConstraint", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName, @isDisable=false }, FormMethod.Post, null))
 {
     <table class="table table-responsive table-bordered table-hover">
         <thead>
             <tr>
-                <th>Disabled All Table Constraint</th>
-                <th>Disabled Single Constraint</th>
+                <th>Enable All Table Constraint</th>
+                <th>Enable Single Constraint</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><button class="btn btn-primary" type="submit" name="all">Disabled All</button></td>
+                <td><button class="btn btn-primary" type="submit" name="all">Enable All</button></td>
                 <td>@Html.DropDownList("constraintName", new SelectList(ViewBag.Constraints))</td>
             </tr>
             <tr>
                 <td></td>
                 <td>
-                    <button class="btn btn-primary" type="submit">Disabled single</button>
+                    <button class="btn btn-primary" type="submit">Enable single</button>
                 </td>
             </tr>
         </tbody>
     </table>
 }
-@Html.ActionLink("Back", "Index", new { @appName = Model.AppName }, new { @class = "btn btn-default" })
+@Html.ActionLink("Back", "Index", new { @appName = Model.Application.Name }, new { @class = "btn btn-default" })

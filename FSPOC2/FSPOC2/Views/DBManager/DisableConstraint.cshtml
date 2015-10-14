@@ -6,7 +6,7 @@
 
 <h2>DisableConstraint</h2>
 
-@using (Html.BeginForm("DisableOrEnableConstraint", "DBManager", new { @appName = Model.AppName, @tableName = Model.tableName, @isDisable = true }, FormMethod.Post, null))
+@using (Html.BeginForm("DisableOrEnableConstraint", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName, @isDisable = true }, FormMethod.Post, null))
 {
     <table class="table table-responsive table-bordered table-hover">
         <thead>
@@ -29,4 +29,4 @@
         </tbody>
     </table>
 }
-@Html.ActionLink("Back","Index",new{@appName=Model.AppName}, new{@class="btn btn-default"})
+@Html.ActionLink("Back","Index",new{@appName=Model.Application.Name}, new{@class="btn btn-default"})
