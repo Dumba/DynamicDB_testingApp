@@ -260,19 +260,28 @@ namespace FSPOC2.Controllers
             return View(new DBForeignKey() { sourceTable = table });
         }
         [HttpPost]
-        public ActionResult AddForeignKey(string appName, string tableName, DBForeignKey model)
-        {
+        public ActionResult AddForeignKey(string appName, DBForeignKey model)
+        { 
             DBApp app = new DBApp()
             {
                 Name = appName,
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
 
-            DBTable table = app.GetTable(tableName);
-            table.foreignKeys.AddToDB(model);
+            DBTable sTable = app.GetTable(model.sourceTable.tableName);
+            DBTable tTable = app.GetTable(model.targetTable.tableName);
+            DBColumn sColumn = sTable.columns.SingleOrDefault(x => x.Name == model.sourceColumn);
+            DBColumn tColumn = tTable.columns.SingleOrDefault(x => x.Name == model.targetColumn);
+            
+            if (sColumn.type != tColumn.type) //columns must have equal data types
+            {
+                TempData["message-error"] = "Keys have different data types.";
+                return RedirectToAction("CreateForeignKey", new { @appName = appName, @tableName = sTable.tableName });
+            }
+            sTable.foreignKeys.AddToDB(model);
             app.SaveChanges();
             
-            TempData["message-success"] = "Foreign key " + model.name + " of table " + tableName + " was successfully created.";
+            TempData["message-success"] = "Foreign key " + model.name + " of table " + sTable.tableName + " was successfully created.";
             return RedirectToAction("Index", new { @appName = appName });
         }
 
