@@ -10,7 +10,7 @@
         <thead>
             <tr>
                 <th>Název indexu</th>
-                <td>@Html.DropDownList("indexName", new SelectList(Model.indices, "Name"))</td>
+                <td>@Html.DropDownList("indexName", new SelectList(ViewBag.indeces, "Name"))</td>
             </tr>
         </thead>
         <tbody>

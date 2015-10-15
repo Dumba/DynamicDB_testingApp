@@ -4,8 +4,10 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Xml;
 using FSPOC2.Models;
 using Entitron;
+using Microsoft.SqlServer.Server;
 
 namespace FSPOC2.Controllers
 {
@@ -28,7 +30,7 @@ namespace FSPOC2.Controllers
                 Name = appName,
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
-            
+
             return View(app.GetTable(tableName));
         }
         public ActionResult Data(string appName, string tableName)
@@ -57,11 +59,11 @@ namespace FSPOC2.Controllers
                     ConnectionString = (new Entities()).Database.Connection.ConnectionString
                 };
 
-                model.Application= app;
+                model.Application = app;
                 model.Create();
 
                 app.SaveChanges();
-
+                TempData["message-success"] = "Table "+ model.tableName +" was successfully created.";
                 return RedirectToAction("Index", new { @appName = appName });
             }
 
@@ -78,7 +80,7 @@ namespace FSPOC2.Controllers
 
             app.GetTable(tableName).Drop();
             app.SaveChanges();
-
+            TempData["message-success"] = "Table "+tableName+" was successfully dropped.";
             return RedirectToAction("Index", new { @appName = appName });
 
         }
@@ -151,7 +153,7 @@ namespace FSPOC2.Controllers
                 }
 
                 app.SaveChanges();
-
+                TempData["message-success"] = "Table "+tableName+" was successfully altered.";
                 return RedirectToAction("Index", new { @appName = appName });
             }
 
@@ -181,7 +183,6 @@ namespace FSPOC2.Controllers
                 Name = appName,
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
-            
             return View(app.GetTable(tableName));
         }
         [HttpPost]
@@ -196,7 +197,8 @@ namespace FSPOC2.Controllers
             DBTable table = app.GetTable(tableName);
             table.indices.AddToDB(fc["indexName"], indexColumns);
             app.SaveChanges();
-
+                        
+            TempData["message-success"] = "Index "+fc["indexname"]+" of table "+tableName+" was successfully created.";
             return RedirectToAction("Index", new { @appName = appName });
         }
 
@@ -207,9 +209,24 @@ namespace FSPOC2.Controllers
                 Name = appName,
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
-
             DBTable table = app.GetTable(tableName);
-            return View(table);
+            List<string> indexNames = new List<string>();
+
+            foreach (DBIndex index in table.indices)
+            {
+                if (index.indexName != "index_" + appName + tableName)
+                {
+                    indexNames.Add(index.indexName);
+                }
+            }
+
+            if (indexNames.Count != 0)
+            {
+                ViewBag.indeces = indexNames;
+                return View(table);
+            }
+            TempData["message-error"] = "Table has no index to drop.";
+            return RedirectToAction("Index", new { @appName = appName });
         }
         [HttpPost]
         public ActionResult DeleteIndex(string appName, string tableName, string indexName)
@@ -224,7 +241,7 @@ namespace FSPOC2.Controllers
 
             table.indices.DropFromDB(indexName);
             app.SaveChanges();
-
+            TempData["message-success"] = "Index " + indexName + " of table " + tableName + " was successfully dropped.";
             return RedirectToAction("Index", new { @appName = appName });
         }
 
@@ -252,10 +269,10 @@ namespace FSPOC2.Controllers
             };
 
             DBTable table = app.GetTable(tableName);
-
             table.foreignKeys.AddToDB(model);
             app.SaveChanges();
-
+            
+            TempData["message-success"] = "Foreign key " + model.name + " of table " + tableName + " was successfully created.";
             return RedirectToAction("Index", new { @appName = appName });
         }
 
@@ -267,8 +284,13 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            ViewBag.foreignKeys = table.foreignKeys.Select(x=>x.name);
-            return View(table);
+            if (table.foreignKeys.GetForeignKeyForDrop().Count != 0)
+            {
+                ViewBag.foreignKeys = table.foreignKeys.GetForeignKeyForDrop();
+                return View(table);
+            }
+            TempData["message-error"] = "Table has no foreign key to drop.";
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult DeleteForeignKey(string appName, string tableName, string foreignKeyName)
@@ -282,7 +304,7 @@ namespace FSPOC2.Controllers
 
             table.foreignKeys.DropFromDB(foreignKeyName);
             app.SaveChanges();
-
+            TempData["message-success"] = "Foreign key " + foreignKeyName + " of table " + tableName + " was successfully dropped.";
             return RedirectToAction("Index", new { @appName = appName });
         }
 
@@ -311,7 +333,7 @@ namespace FSPOC2.Controllers
 
             table.AddPrimaryKey(primaryKeys);
             app.SaveChanges();
-
+            TempData["message-success"] = "Primary key of table " + tableName + " was successfully created.";
             return RedirectToAction("Index", new { @appName = appName });
         }
 
@@ -323,9 +345,16 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-
-            table.DropPrimaryKey();
-            app.SaveChanges();
+            if (table.primaryKeys.Count != 0)
+            {
+                table.DropPrimaryKey();
+                app.SaveChanges();
+            }
+            else
+            {
+                TempData["message-error"] = "Table has no primary key to drop.";
+            }
+            TempData["message-success"] = "Primary key of table " + tableName + " was successfully dropped.";
             return RedirectToAction("Index", new { @appName = appName });
         }
         [HttpPost]
@@ -341,10 +370,54 @@ namespace FSPOC2.Controllers
             DBItem row = new DBItem();
             foreach (DBColumn c in table.columns)
             {
-                if (c.type.ToLower() == "int")
-                    row[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
-                else
-                    row[c.Name] = fc.Get("col" + c.Name);
+                switch (c.type.ToLower())
+                {
+                    case "int": row[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
+                        break;
+                    case "bigint": row[c.Name] = Convert.ToInt64(fc.Get("col" + c.Name));
+                        break;
+                    case "smallint": row[c.Name] = Convert.ToInt16(fc.Get("col" + c.Name));
+                        break;
+                    case "tinyint": row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "decimal": row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
+                        break;
+                    case "smallmoney": row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
+                        break;
+                    case "money": row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
+                        break;
+                    case "float": row[c.Name] = Convert.ToDouble(fc.Get("col" + c.Name));
+                        break;
+                    case "real": row[c.Name] = Convert.ToSingle(fc.Get("col" + c.Name));
+                        break;
+                    case "date": row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
+                        break;
+                    case "time": row[c.Name] = TimeSpan.Parse(fc.Get("col" + c.Name));
+                        break;
+                    case "datetime": row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
+                        break;
+                    case "datetime2": row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
+                        break;
+                    case "datetimeoffset": row[c.Name] = DateTimeOffset.Parse(fc.Get("col" + c.Name));
+                        break;
+                    case "timestamp": row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "varbinary": row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "bit": row[c.Name] = Convert.ToBoolean(fc.Get("col" + c.Name));
+                        break;
+                    case "binary": row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "uniqueidentifier": row[c.Name] = Guid.Parse(fc.Get("col" + c.Name));
+                        break;
+                    default: row[c.Name] = fc.Get("col" + c.Name);
+                        break;
+
+                }
+                //if (c.type.ToLower() == "int")
+                //    row[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
+                //else
+                //    row[c.Name] = fc.Get("col" + c.Name);
             }
 
             table.Add(row);
@@ -353,7 +426,7 @@ namespace FSPOC2.Controllers
         }
 
         [HttpPost]
-        public ActionResult DeleteOrUpdate(string appName, string tableName, FormCollection fs)
+        public ActionResult DeleteOrUpdate(string appName, string tableName, FormCollection fc)
         {
             DBApp app = new DBApp()
             {
@@ -366,11 +439,73 @@ namespace FSPOC2.Controllers
 
             foreach (DBColumn c in table.columns)
             {
-                row[c.Name] = fs.Get("col" + c.Name);
+                switch (c.type.ToLower())
+                {
+                    case "int":
+                        row[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
+                        break;
+                    case "bigint":
+                        row[c.Name] = Convert.ToInt64(fc.Get("col" + c.Name));
+                        break;
+                    case "smallint":
+                        row[c.Name] = Convert.ToInt16(fc.Get("col" + c.Name));
+                        break;
+                    case "tinyint":
+                        row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "decimal":
+                        row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
+                        break;
+                    case "smallmoney":
+                        row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
+                        break;
+                    case "money":
+                        row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
+                        break;
+                    case "float":
+                        row[c.Name] = Convert.ToDouble(fc.Get("col" + c.Name));
+                        break;
+                    case "real":
+                        row[c.Name] = Convert.ToSingle(fc.Get("col" + c.Name));
+                        break;
+                    case "date":
+                        row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
+                        break;
+                    case "time":
+                        row[c.Name] = TimeSpan.Parse(fc.Get("col" + c.Name));
+                        break;
+                    case "datetime":
+                        row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
+                        break;
+                    case "datetime2":
+                        row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
+                        break;
+                    case "datetimeoffset":
+                        row[c.Name] = DateTimeOffset.Parse(fc.Get("col" + c.Name));
+                        break;
+                    case "timestamp":
+                        row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "varbinary":
+                        row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "bit":
+                        row[c.Name] = Convert.ToBoolean(fc.Get("col" + c.Name));
+                        break;
+                    case "binary":
+                        row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "uniqueidentifier":
+                        row[c.Name] = Guid.Parse(fc.Get("col" + c.Name));
+                        break;
+                    default:
+                        row[c.Name] = fc.Get("col" + c.Name);
+                        break;
+                }
                 TempData.Remove(c.Name);
                 TempData.Add(c.Name, row[c.Name]);
             }
-            if (fs.Get("Update") != null)
+            if (fc.Get("Update") != null)
             {
                 ViewBag.Row = row.getAllProperties();
                 return View("UpdateView", table);
@@ -399,7 +534,69 @@ namespace FSPOC2.Controllers
 
             foreach (DBColumn c in table.columns)
             {
-                changes[c.Name] = fc.Get("col" + c.Name);
+                switch (c.type.ToLower())
+                {
+                    case "int":
+                        changes[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
+                        break;
+                    case "bigint":
+                        changes[c.Name] = Convert.ToInt64(fc.Get("col" + c.Name));
+                        break;
+                    case "smallint":
+                        changes[c.Name] = Convert.ToInt16(fc.Get("col" + c.Name));
+                        break;
+                    case "tinyint":
+                        changes[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "decimal":
+                        changes[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
+                        break;
+                    case "smallmoney":
+                        changes[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
+                        break;
+                    case "money":
+                        changes[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
+                        break;
+                    case "float":
+                        changes[c.Name] = Convert.ToDouble(fc.Get("col" + c.Name));
+                        break;
+                    case "real":
+                        changes[c.Name] = Convert.ToSingle(fc.Get("col" + c.Name));
+                        break;
+                    case "date":
+                        changes[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
+                        break;
+                    case "time":
+                        changes[c.Name] = TimeSpan.Parse(fc.Get("col" + c.Name));
+                        break;
+                    case "datetime":
+                        changes[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
+                        break;
+                    case "datetime2":
+                        changes[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
+                        break;
+                    case "datetimeoffset":
+                        changes[c.Name] = DateTimeOffset.Parse(fc.Get("col" + c.Name));
+                        break;
+                    case "timestamp":
+                        changes[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "varbinary":
+                        changes[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "bit":
+                        changes[c.Name] = Convert.ToBoolean(fc.Get("col" + c.Name));
+                        break;
+                    case "binary":
+                        changes[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
+                        break;
+                    case "uniqueidentifier":
+                        changes[c.Name] = Guid.Parse(fc.Get("col" + c.Name));
+                        break;
+                    default:
+                        changes[c.Name] = fc.Get("col" + c.Name);
+                        break;
+                }
                 oldVal[c.Name] = TempData[c.Name];
             }
             table.Update(changes, oldVal);
@@ -420,11 +617,22 @@ namespace FSPOC2.Controllers
 
             if (isDisable)
             {
-                 return View("DisableConstraint", table);
+                if (table.getConstraints(isDisable).Count != 0)
+                {
+                    return View("DisableConstraint", table);
+                }
+                TempData["message-error"] = "Table has no constraint to disable.";
+                return RedirectToAction("Index", new { @appName = appName });
             }
             else
             {
-                return View("EnableConstraint", table);
+                if (table.getConstraints(isDisable).Count != 0)
+                {
+                    return View("EnableConstraint", table);
+
+                }
+                TempData["message-error"] = "Table has no constraint to enable.";
+                return RedirectToAction("Index", new { @appName = appName });
             }
         }
 
@@ -442,38 +650,18 @@ namespace FSPOC2.Controllers
             if (isDisable)
             {
                 table.DisableConstraint(constraintName);
+                TempData["message-success"] = "Constraint  of table " + tableName + " was successfully disabled.";
             }
             else
             {
                 table.EnableConstraint(constraintName);
+                TempData["message-success"] = "Constraint  of table " + tableName + " was successfully enabled.";
             }
 
             app.SaveChanges();
 
             return RedirectToAction("Index", new { @appName = appName });
         }
-
-        //public ActionResult EnableConstraint(string appName, string tableName)
-        //{
-        //    DBTable.ApplicationName = appName;
-        //    DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-        //    DBTable table = DBTable.GetTable(tableName);
-        //    ViewBag.Constraints = table.getConstraints();
-        //    return View(table);
-        //}
-
-        //public ActionResult EnableCon(string appName, string tableName, FormCollection fc)
-        //{
-        //    DBTable.ApplicationName = appName;
-        //    DBTable.connectionString = (new Entities()).Database.Connection.ConnectionString;
-        //    DBTable table = DBTable.GetTable(tableName);
-
-        //    string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
-        //    table.EnableConstraint(constraintName);
-        //    DBTable.SaveChanges();
-
-        //    return RedirectToAction("Index", new { @appName = appName });
-        //}
 
         public JsonResult getTableColumns(string tableName, string appName)
         {
