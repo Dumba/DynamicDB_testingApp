@@ -1,86 +1,102 @@
-﻿    @using Entitron
-    @using System.Data
-    @using System.Web.UI.WebControls
-    @model DBTable
-    @{
-        ViewBag.Title = "Create";
-        var types = Enum.GetValues(typeof(SqlDbType));
-        int i = 0;
-    }
-    <script>
-        $(document).ready(function () {     
-            function reindex($row, newId) {
-                $row.find('input, select').each(function () {
-                    this.name = this.name.replace(/\[[0-9]+\]/, '[' + newId + ']');
-                });
-                $row.attr('data-id', newId);
-            }
-            function reindexAll() {
-                $('#newColumn tr[data-id]').each(function (index) {
-                    reindex($(this), index);
-                });
-            }
-
-            $('#btnAddColumn').click(function () {
-                var $table = $('#newColumn');
-                var columnCount = $table.find('tr[data-id]').length;
-                var nextId = columnCount; // index začíná 0
-
-                var $newRow = $('#ColumnTemplate').clone();
-                reindex($newRow, nextId);
-                $newRow.find('input, select').attr('disabled', false);
-                $newRow.removeAttr('id style');
-                $table.append($newRow);
-                return false;
+﻿@using Entitron
+@using System.Data
+@using System.Web.UI.WebControls
+@model DBTable
+@{
+    ViewBag.Title = "Create";
+    var types = Enum.GetValues(typeof(SqlDbType));
+    int i = 0;
+}
+<script>
+    $(document).ready(function () {
+        function reindex($row, newId) {
+            $row.find('input, select').each(function () {
+                this.name = this.name.replace(/\[[0-9]+\]/, '[' + newId + ']');
             });
-
-            $(document).on('click', '.btnRemoveColumn', function () {
-                $(this).parents('tr').eq(0).remove();
-                reindexAll();
-                return false;
-            });
-
-            $('#btnAddColumn').click();
-        });
-    </script>
-    <h2>Detail</h2>
-
-    @using (Html.BeginForm("AlterTable", "DBManager", new { @appName = Model.Application.Name }, FormMethod.Post, null))
-    {
-
-        <table class="table table-bordered" id="mytable">
-    <thead>
-    <tr>
-    <th>Name: </th>
-    <td>@Html.TextBoxFor(x => x.tableName, "tableName")</td>
-    <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Max Length</th>
-        <th>Can be null?</th>
-        <th></th>
-    </tr>
-    </thead>
-            <tbody>
-        @for (int t=0;t<Model.columns.Count;t++)
-        {
-            <tr>
-                <td>@Html.TextBoxFor(c=>c.columns[t].Name)</td>
-                @*<td>@column.type.ToString()</td>*@
-                <td>@Html.TextBoxFor(c => c.columns[t].maxLength)</td>
-                <td>@Html.TextBoxFor(c => c.columns[t].canBeNull)</td>
-                <td>@Html.ActionLink("Drop column", "DropColumn", new {@tableName = Model.tableName, @appName = Request["appName"], @columnName = Model.columns[t].Name})</td>
-
-            </tr>
+            $row.attr('data-id', newId);
         }
-<tr>
-    <td>Actions:</td>
-    <td><button id="btnAddColumn" class="btn btn-success">Add Column</button></td>
-</tr>
-    </tbody>
-        </table>
+        function reindexAll() {
+            $('#newColumn tr[data-id]').each(function (index) {
+                reindex($(this), index);
+            });
+        }
 
-<button type="submit">Alter Table</button>
-@Html.ActionLink("Back", "Index", new { @appName = Model.Application.Name })
+        $('#btnAddColumn').click(function () {
+            var $table = $('#newColumn');
+            var columnCount = $table.find('tr[data-id]').length;
+            var nextId = columnCount; // index začíná 0
+
+            var $newRow = $('#ColumnTemplate').clone();
+            reindex($newRow, nextId);
+            $newRow.find('input, select').attr('disabled', false);
+            $newRow.removeAttr('id style');
+            $table.append($newRow);
+            return false;
+        });
+
+        $(document).on('click', '.btnRemoveColumn', function () {
+            $(this).parents('tr').eq(0).remove();
+            reindexAll();
+            return false;
+        });
+
+        $('#btnAddColumn').click();
+    });
+</script>
+<h2>Detail</h2>
+
+@if (TempData["message-success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade in" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        @TempData["message-success"]
+    </div>
+}
+
+@using (Html.BeginForm("RenameTable", "DBManager", new { @appName = Model.Application.Name }, FormMethod.Post, null))
+{
+
+    <table class="table table-bordered" id="mytable">
+        <thead>
+            <tr>
+                <th>Name: </th>
+                <td>@Html.TextBoxFor(x => x.tableName, "tableName")</td>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Max Length</th>
+                <th>Precision</th>
+                <th>Scale</th>
+                <th>Unique</th>
+                <th>Can be null?</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int t = 0; t < Model.columns.Count; t++)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(c => c.columns[t].Name)</td>
+                    <td>@Html.DisplayFor(c => c.columns[t].type)</td>
+                    <td>@Html.DisplayFor(c => c.columns[t].maxLength)</td>
+                    <td>@Html.DisplayFor(c => c.columns[t].precision)</td>
+                    <td>@Html.DisplayFor(c => c.columns[t].scale)</td>
+                    <td>@Html.DisplayFor(c => c.columns[t].isUnique)</td>
+                    <td>@Html.DisplayFor(c => c.columns[t].canBeNull)</td>
+                <td>
+                    @Html.ActionLink("Drop column", "DropColumn", new {@tableName = Model.tableName, @appName = Request["appName"], @columnName = Model.columns[t].Name}, new {@class = "btn btn-danger"})
+                    @Html.ActionLink("Alter column", "AlterColumn", new { @tableName = Model.tableName, @appName = Request["appName"], @columnName = Model.columns[t].Name }, new { @class = "btn btn-success" })
+                </td>
+                </tr>
+            }
+        <tr>
+            <td>@Html.ActionLink("Add Column", "AddColumn", new { @tableName = Model.tableName, @appName = Request["appName"]}, new{@class="btn btn-primary"})</td>
+        </tr>
+           
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Rename Table</button>
+    @Html.ActionLink("Back", "Index", new { @appName = Model.Application.Name })
 
 }

@@ -58,16 +58,12 @@
             <th>On Delete Action</th>
             <td>
                 @Html.RadioButtonFor(fk=>fk.onDelete,"deleteAction", "cascade") Cascade
-                @Html.RadioButtonFor(fk => fk.onDelete, "deleteAction", "null") Set Null
-                @Html.RadioButtonFor(fk => fk.onDelete, "deleteAction", "default") Set Default
             </td>
         </tr>
         <tr>
             <th>On Update Action</th>
             <td>
                 @Html.RadioButtonFor(fk => fk.onUpdate, "updateAction", "cascade") Cascade
-                @Html.RadioButtonFor(fk => fk.onUpdate, "updateAction", "null") Set Null
-                @Html.RadioButtonFor(fk => fk.onUpdate, "updateAction", "default") Set Default
             </td>
         </tr>
         </thead>

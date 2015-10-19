@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "AddColumn";
     List<SelectListItem> types = new List<SelectListItem>();
-    foreach(System.Data.SqlDbType type in Enum.GetValues(typeof(System.Data.SqlDbType)))
+    foreach (System.Data.SqlDbType type in Enum.GetValues(typeof(System.Data.SqlDbType)))
     {
         types.Add(new SelectListItem() { Text = type.ToString(), Value = ((int)type).ToString() });
     }
@@ -29,11 +29,23 @@
             <td>@Html.TextBoxFor(m => m.maxLength)</td>
         </tr>
         <tr>
+            <th>Precision: </th>
+            <td>@Html.TextBoxFor(m => m.precision)</td>
+        </tr>
+        <tr>
+            <th>Scale: </th>
+            <td>@Html.TextBoxFor(m => m.scale)</td>
+        </tr>
+        <tr>
+            <th>Maximum length: </th>
+            <td>@Html.TextBoxFor(m => m.isUnique)</td>
+        </tr>
+        <tr>
             <th>Can be null?</th>
             <td>@Html.CheckBoxFor(c => c.canBeNull)</td>
         </tr>
     </table>
 
-    <button>Add</button>
-    @Html.ActionLink("Back", "Details", new { @appName = Request["appName"], @tableName = Request["tableName"] })
+    <button class="btn btn-primary" type="submit">Add</button>
+    @Html.ActionLink("Back", "Details", new { @appName = Request["appName"], @tableName = Request["tableName"] }, new{@class="btn btn-default"})
 }

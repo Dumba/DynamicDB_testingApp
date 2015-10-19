@@ -303,6 +303,7 @@
     <Content Include="Views\DBManager\UpdateView.cshtml" />
     <Content Include="Views\DBManager\DisableConstraint.cshtml" />
     <Content Include="Views\DBManager\EnableConstraint.cshtml" />
+    <Content Include="Views\DBManager\AlterColumn.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
