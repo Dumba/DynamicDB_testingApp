@@ -5,7 +5,7 @@
     List<SelectListItem> types = new List<SelectListItem>();
     foreach (System.Data.SqlDbType type in Enum.GetValues(typeof(System.Data.SqlDbType)))
     {
-        types.Add(new SelectListItem() { Text = type.ToString(), Value = ((int)type).ToString() });
+        types.Add(new SelectListItem() { Text = type.ToString()});
     }
 
 }

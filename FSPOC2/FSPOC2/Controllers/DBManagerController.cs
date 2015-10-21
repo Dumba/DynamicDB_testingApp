@@ -62,10 +62,21 @@ namespace FSPOC2.Controllers
                 };
 
                 model.Application = app;
+                foreach (DBColumn c in model.columns)
+                {
+                    foreach (DBColumn d in model.columns)
+                    {
+                        if (c == d)
+                        {
+                            TempData["message-error"] = "Table " + model.tableName + " can not be created. Column name" + c.Name + "is in table more then once.";
+                            return RedirectToAction("Index", new { @appName = appName });
+                        }
+                    }
+                }
                 model.Create();
 
                 app.SaveChanges();
-                TempData["message-success"] = "Table "+ model.tableName +" was successfully created.";
+                TempData["message-success"] = "Table " + model.tableName + " was successfully created.";
                 return RedirectToAction("Index", new { @appName = appName });
             }
 
@@ -82,7 +93,7 @@ namespace FSPOC2.Controllers
 
             app.GetTable(tableName).Drop();
             app.SaveChanges();
-            TempData["message-success"] = "Table "+tableName+" was successfully dropped.";
+            TempData["message-success"] = "Table " + tableName + " was successfully dropped.";
             return RedirectToAction("Index", new { @appName = appName });
 
         }
@@ -112,11 +123,11 @@ namespace FSPOC2.Controllers
                     Name = appName,
                     ConnectionString = (new Entities()).Database.Connection.ConnectionString
                 };
-                
+
                 DBTable table = app.GetTable(tableName);
                 table.Rename(model.tableName);
                 app.SaveChanges();
-                TempData["message-success"] = "Table "+tableName+" was successfully renamed to "+model.tableName+".";
+                TempData["message-success"] = "Table " + tableName + " was successfully renamed to " + model.tableName + ".";
                 return RedirectToAction("Index", new { @appName = appName });
             }
 
@@ -137,8 +148,20 @@ namespace FSPOC2.Controllers
                 Name = appName,
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
-            app.GetTable(tableName)
-                .columns.AddToDB(column);
+            DBTable table = app.GetTable(tableName);
+
+            if (table.Select().ToList().Count != 0 && column.canBeNull == false)
+            {
+                TempData["message-error"] = "Table " + tableName + " must be empty if you want to add NOT NULL column.";
+                return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
+            }
+            else if (table.columns.SingleOrDefault(x => x.Name == column.Name) != null)
+            {
+                TempData["message-error"] = "Table " + tableName + " has already column with name " + column.Name + ".";
+                return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
+            }
+
+            table.columns.AddToDB(column);
             app.SaveChanges();
             TempData["message-success"] = "Column " + column.Name + " was successfully added.";
 
@@ -154,6 +177,16 @@ namespace FSPOC2.Controllers
             };
             DBTable table = app.GetTable(tableName);
             DBColumn col = table.columns.SingleOrDefault(c => c.Name == columnName);
+            //foreach pro korekci názvů sloupců, název sloupce který upravujeme nekontrolujeme, zbytek ano
+
+            foreach (DBColumn c in table.columns)
+            {
+                TempData.Remove(c.Name);
+                if (col != c)
+                {
+                    TempData.Add(c.Name,c.Name);
+                }
+            }
 
             return View(col);
         }
@@ -166,8 +199,39 @@ namespace FSPOC2.Controllers
                 Name = appName,
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
-            app.GetTable(tableName)
-                .columns.ModifyInDB(column);
+            DBTable table = app.GetTable(tableName);
+            
+            foreach (string s in TempData.Keys)
+            {
+                if (s == column.Name)
+                {
+                    TempData["message-error"] = "Table " + tableName + " has already column with name " + column.Name + ".";
+                    ViewBag.ColName = column.Name;
+                    return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
+                }
+            }
+
+            if (column.canBeNull != true)
+            {
+                foreach (DBItem i in table.Select().ToList())
+                {
+                    foreach (DBColumn c in table.columns)
+                    {
+                        if (c.Name == column.Name)
+                        {
+                            if (i[column.Name] == null || i[column.Name]=="")
+                            {
+                                TempData["message-error"] = "Column " + column.Name + " can not be null. It has null values.";
+                                return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
+                            }
+                        }
+                        
+                    }
+
+                }
+            }
+
+            table.columns.ModifyInDB(column);
             app.SaveChanges();
 
             TempData["message-success"] = "Column " + column.Name + " was successfully altered.";
@@ -211,8 +275,8 @@ namespace FSPOC2.Controllers
             DBTable table = app.GetTable(tableName);
             table.indices.AddToDB(fc["indexName"], indexColumns);
             app.SaveChanges();
-                        
-            TempData["message-success"] = "Index "+fc["indexname"]+" of table "+tableName+" was successfully created.";
+
+            TempData["message-success"] = "Index " + fc["indexname"] + " of table " + tableName + " was successfully created.";
             return RedirectToAction("Index", new { @appName = appName });
         }
 
@@ -275,7 +339,7 @@ namespace FSPOC2.Controllers
         }
         [HttpPost]
         public ActionResult AddForeignKey(string appName, DBForeignKey model)
-        { 
+        {
             DBApp app = new DBApp()
             {
                 Name = appName,
@@ -286,7 +350,7 @@ namespace FSPOC2.Controllers
             DBTable tTable = app.GetTable(model.targetTable.tableName);
             DBColumn sColumn = sTable.columns.SingleOrDefault(x => x.Name == model.sourceColumn);
             DBColumn tColumn = tTable.columns.SingleOrDefault(x => x.Name == model.targetColumn);
-            
+
             if (sColumn.type != tColumn.type) //columns must have equal data types
             {
                 TempData["message-error"] = "Keys have different data types.";
@@ -294,7 +358,7 @@ namespace FSPOC2.Controllers
             }
             sTable.foreignKeys.AddToDB(model);
             app.SaveChanges();
-            
+
             TempData["message-success"] = "Foreign key " + model.name + " of table " + sTable.tableName + " was successfully created.";
             return RedirectToAction("Index", new { @appName = appName });
         }
