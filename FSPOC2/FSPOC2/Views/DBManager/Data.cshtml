@@ -5,12 +5,29 @@
     ViewBag.Title = "Data";
     DBItem row = new DBItem();
 }
-    <div class="col-sm-10">
+@if (TempData["message-success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade in" role="alert" style="margin-top: 15px">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        @TempData["message-success"]
+    </div>
+}
+@if (TempData["message-error"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade in" role="alert" style="margin-top: 15px">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+        @TempData["message-error"]
+    </div>
+}
+
+
+<div class="col-sm-10">
         <h2>Data tabulky @Model.tableName</h2>
     </div>
     <div class="pull-left" style="margin-top: 20px">
         @Html.ActionLink("Truncate Table", "TruncateTable", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, new { @class = "btn btn-danger" })
     </div>
+
 
 <table class="table table-bordered table-hover table-responsive table-condensed">
     <thead>

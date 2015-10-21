@@ -177,6 +177,8 @@ namespace FSPOC2.Controllers
             };
             DBTable table = app.GetTable(tableName);
             DBColumn col = table.columns.SingleOrDefault(c => c.Name == columnName);
+            TempData.Remove("oldColumnName");
+            TempData.Add("oldColumnName",columnName);
             //foreach pro korekci názvů sloupců, název sloupce který upravujeme nekontrolujeme, zbytek ano
 
             foreach (DBColumn c in table.columns)
@@ -230,7 +232,10 @@ namespace FSPOC2.Controllers
 
                 }
             }
-
+            if (column.Name!=TempData["oldColumnName"].ToString())
+            {
+                table.columns.RenameInDB(TempData["oldColumnName"].ToString(), column.Name);
+            }
             table.columns.ModifyInDB(column);
             app.SaveChanges();
 
@@ -454,8 +459,17 @@ namespace FSPOC2.Controllers
             };
 
             DBTable table = app.GetTable(tableName);
+            foreach (DBIndex index in table.indices) //condition for cluster, you can not insert/update/delete without cluster in Azure
+            {
+                if (index.indexName == "index_" + appName + tableName)
+                {
+                    TempData["message-error"] = "Row can not be inserted, because table does not have a cluster index. The cluster index is created when you first create a primary key.";
+                    return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
+                }
+            }
+
             DBItem row = new DBItem();
-            foreach (DBColumn c in table.columns)
+            foreach (DBColumn c in table.columns)  //converting to right data type
             {
                 if (fc.Get("col" + c.Name) == "")
                 {
@@ -463,8 +477,6 @@ namespace FSPOC2.Controllers
                 }
                 else
                 {
-
-
                     switch (c.type.ToLower())
                     {
                         case "int":
@@ -530,14 +542,11 @@ namespace FSPOC2.Controllers
 
                     }
                 }
-                //if (c.type.ToLower() == "int")
-                //    row[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
-                //else
-                //    row[c.Name] = fc.Get("col" + c.Name);
             }
 
             table.Add(row);
-            app.SaveChanges();
+            app.SaveChanges(); 
+            TempData["message-success"] = "Row was successfully inserted.";
             return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
         }
 
@@ -553,7 +562,7 @@ namespace FSPOC2.Controllers
             DBTable table = app.GetTable(tableName);
             DBItem row = new DBItem();
 
-            foreach (DBColumn c in table.columns)
+            foreach (DBColumn c in table.columns)//converting to right data type
             {
                 switch (c.type.ToLower())
                 {
@@ -630,7 +639,7 @@ namespace FSPOC2.Controllers
             {
                 table.Remove(row);
                 app.SaveChanges();
-
+                TempData["message-success"] = "Row was successfully deleted.";
                 return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
             }
 
@@ -648,7 +657,7 @@ namespace FSPOC2.Controllers
             DBItem changes = new DBItem();
             DBItem oldVal = new DBItem();
 
-            foreach (DBColumn c in table.columns)
+            foreach (DBColumn c in table.columns)//converting to right data type
             {
                 switch (c.type.ToLower())
                 {
@@ -717,7 +726,7 @@ namespace FSPOC2.Controllers
             }
             table.Update(changes, oldVal);
             app.SaveChanges();
-
+            TempData["message-success"] = "Row was successfully updated.";
             return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
         }
 
