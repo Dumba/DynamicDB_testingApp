@@ -304,6 +304,10 @@
     <Content Include="Views\DBManager\DisableConstraint.cshtml" />
     <Content Include="Views\DBManager\EnableConstraint.cshtml" />
     <Content Include="Views\DBManager\AlterColumn.cshtml" />
+    <Content Include="Views\DBManager\CreateUnique.cshtml" />
+    <Content Include="Views\DBManager\DropUnique.cshtml" />
+    <Content Include="Views\DBManager\CreateDefault.cshtml" />
+    <Content Include="Views\DBManager\DropDefault.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

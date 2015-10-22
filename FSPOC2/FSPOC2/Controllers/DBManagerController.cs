@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using System.Xml;
 using FSPOC2.Models;
 using Entitron;
@@ -385,21 +386,6 @@ namespace FSPOC2.Controllers
             return RedirectToAction("Index", new { @appName = appName });
         }
 
-        public ActionResult DeleteForeignKey(string appName, string tableName, string foreignKeyName)
-        {
-            DBApp app = new DBApp()
-            {
-                Name = appName,
-                ConnectionString = (new Entities()).Database.Connection.ConnectionString
-            };
-            DBTable table = app.GetTable(tableName);
-
-            table.foreignKeys.DropFromDB(foreignKeyName);
-            app.SaveChanges();
-            TempData["message-success"] = "Foreign key " + foreignKeyName + " of table " + tableName + " was successfully dropped.";
-            return RedirectToAction("Index", new { @appName = appName });
-        }
-
         public ActionResult CreatePrimaryKey(string appName, string tableName)
         {
             DBApp app = new DBApp()
@@ -429,26 +415,6 @@ namespace FSPOC2.Controllers
             return RedirectToAction("Index", new { @appName = appName });
         }
 
-        public ActionResult DropPrimaryKey(string appName, string tableName)
-        {
-            DBApp app = new DBApp()
-            {
-                Name = appName,
-                ConnectionString = (new Entities()).Database.Connection.ConnectionString
-            };
-            DBTable table = app.GetTable(tableName);
-            if (table.primaryKeys.Count != 0)
-            {
-                table.DropPrimaryKey();
-                app.SaveChanges();
-            }
-            else
-            {
-                TempData["message-error"] = "Table has no primary key to drop.";
-            }
-            TempData["message-success"] = "Primary key of table " + tableName + " was successfully dropped.";
-            return RedirectToAction("Index", new { @appName = appName });
-        }
         [HttpPost]
         public ActionResult InsertRow(string appName, string tableName, FormCollection fc)
         {
@@ -788,7 +754,183 @@ namespace FSPOC2.Controllers
             return RedirectToAction("Index", new { @appName = appName });
         }
 
+        public ActionResult CreateUnique(string appName, string tableName)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
 
+            DBTable table = app.GetTable(tableName);
+            return View(table);
+        }
+
+        [HttpPost]
+        public ActionResult AddUnique(string appName, string tableName, string uniqueName, List<string> uniqueColumns)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
+            foreach (string s in table.columns.GetUniqueConstrainst(true))
+            {
+                if (s =="UN_" + uniqueName)
+                {
+                    TempData["message-error"] = "Unique constraint with name UN_"+uniqueName+" is already exist.";
+                    return RedirectToAction("Index", new { @appName = appName });
+                }
+            }
+            table.columns.AddUniqueValue(uniqueName, uniqueColumns);
+            app.SaveChanges();
+            TempData["message-success"] = "Column(s) " + string.Join(", ", uniqueColumns) + " is/are unique.";
+            return RedirectToAction("Index", new{@appName=appName});
+        }
+
+        public ActionResult DropUnique(string appName, string tableName)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+
+            DBTable table = app.GetTable(tableName);
+            if (table.columns.GetUniqueConstrainst().Count == 0)
+            {
+                TempData["message-error"] = "Table has no unique constraint.";
+                return RedirectToAction("Index", new {@appName = appName});
+            }
+            ViewBag.Unique=table.columns.GetUniqueConstrainst();
+            return View(table);
+        }
+        public ActionResult CreateDefault(string appName, string tableName)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+
+            DBTable table = app.GetTable(tableName);
+            return View(table);
+        }
+
+        [HttpPost]
+        public ActionResult AddDefault(string appName, string tableName, string value, string defaultColumn)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+
+            DBTable table = app.GetTable(tableName);
+            DBColumn c = table.columns.SingleOrDefault(s => s.Name == defaultColumn);
+            object val;
+            switch (c.type.ToLower())
+                {
+                    case "int":
+                        val = Convert.ToInt32(value);
+                        break;
+                    case "bigint":
+                        val= Convert.ToInt64(value);
+                        break;
+                    case "smallint":
+                        val=Convert.ToInt16(value);
+                        break;
+                    case "tinyint":
+                        val=Convert.ToByte(value);
+                        break;
+                    case "decimal":
+                        val=Convert.ToDecimal(value);
+                        break;
+                    case "smallmoney":
+                        val=Convert.ToDecimal(value);
+                        break;
+                    case "money":
+                        val=Convert.ToDecimal(value);
+                        break;
+                    case "float":
+                        val=Convert.ToDouble(value);
+                        break;
+                    case "real":
+                        val=Convert.ToSingle(value);
+                        break;
+                    case "date":
+                        val = Convert.ToDateTime(value);
+                        break;
+                    case "time":
+                        val = TimeSpan.Parse(value);
+                        break;
+                    case "datetime":
+                        val = Convert.ToDateTime(value);
+                        break;
+                    case "datetime2":
+                        val = Convert.ToDateTime(value);
+                        break;
+                    case "datetimeoffset":
+                        val = DateTimeOffset.Parse(value);
+                        break;
+                    case "timestamp":
+                        val = Convert.ToByte(value);
+                        break;
+                    case "varbinary":
+                        val = Convert.ToByte(value);
+                        break;
+                    case "bit":
+                        val= Convert.ToBoolean(value);
+                        break;
+                    case "binary":
+                        val = Convert.ToByte(value);
+                        break;
+                    case "uniqueidentifier":
+                        val = Guid.Parse(value);
+                        break;
+                    default:
+                        val = value;
+                        break;
+                }
+            table.columns.AddDefaultValue(defaultColumn, val);
+            app.SaveChanges();
+            return RedirectToAction("Index", new {@appName = appName});
+        }
+
+        public ActionResult DropDefault(string tableName, string appName)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
+            ViewBag.Defaults = table.columns.GetDefaults();
+            return View(table);
+        }
+        [HttpPost]
+        public ActionResult DropConstraint(string tableName, string appName, string constraintName, bool? isPrimaryKey)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
+            if (isPrimaryKey == true)
+            {
+                if (table.primaryKeys.Count == 0)
+                {
+                    TempData["message-error"] = "Table has no constraint to enable.";
+                    return RedirectToAction("Index", new {@appName = appName});
+                }
+            }
+            table.DropConstraint(constraintName,isPrimaryKey);
+            app.SaveChanges();
+            TempData["message-success"] = "Constraint was successfully dropped.";
+            return RedirectToAction("Index", new { @appName = appName });
+        }
         public JsonResult getTableColumns(string tableName, string appName)
         {
             DBApp app = new DBApp()

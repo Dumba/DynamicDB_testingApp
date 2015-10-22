@@ -1,0 +1,23 @@
+﻿@model Entitron.DBTable
+@{
+    ViewBag.Title = "CreateDefault";
+}
+
+<h2>CreateDefault</h2>
+@using (Html.BeginForm("AddDefault", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, FormMethod.Post, null))
+{
+    <table class="table table-bordered" id="mytable">
+        <thead>
+            <tr>
+                <th>Column</th>
+                <td id="ColumnTemplate">@Html.DropDownList("defaultColumn", new SelectList(Model.columns.Select(c => c.Name), "Name"))</td>
+            </tr>
+            <tr>
+                <th>Value</th>
+                <td>@Html.TextBox("value")</td>
+            </tr>
+        </thead>
+    </table>
+    <button type="submit">Create Default</button>
+    @Html.ActionLink("Back", "Index", new { @appName = Model.Application.Name })
+}

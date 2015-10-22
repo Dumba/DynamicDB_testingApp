@@ -1,0 +1,39 @@
+﻿@model Entitron.DBTable
+@{
+    ViewBag.Title = "CreateUnique";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnAddColumn").click(function () {
+            $('#ColumnTemplate').clone(true).insertAfter('#ColumnTemplate')
+            return false;
+        });
+    });
+</script>
+
+
+<h2>CreateUnique</h2>
+@using (Html.BeginForm("AddUnique", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, FormMethod.Post, null))
+{
+    <table class="table table-bordered" id="mytable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <td>@Html.TextBox("uniqueName")</td>
+            </tr>
+            <tr>
+                <th>Column(s)</th>
+                <td id="ColumnTemplate">@Html.DropDownList("uniqueColumns", new SelectList(Model.columns.Select(c => c.Name), "Name"))</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Actions:</td>
+                <td><button id="btnAddColumn" class="btn btn-success">Add Column</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit">Create Unique</button>
+    @Html.ActionLink("Back", "Index", new { @appName = Model.Application.Name })
+}

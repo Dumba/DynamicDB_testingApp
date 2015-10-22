@@ -23,7 +23,7 @@ else if (TempData["message-error"] != null)
     <thead>
         <tr>
             <th>Table Name</th>
-            <th colspan="10">Actions</th>
+            <th colspan="14">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -33,10 +33,17 @@ else if (TempData["message-error"] != null)
                 <td>@Html.ActionLink(item.tableName, "Data", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("Manage", "Details", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("DropTable", "DropTable", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("CreateIndex", "CreateIndex", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("AddIndex", "CreateIndex", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("DropIndex", "DropIndex", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("AddUnique", "CreateUnique", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropUnique", "DropUnique", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("AddDefault", "CreateDefault", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("DropDefault", "DropDefault", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("AddPrimaryKey", "CreatePrimaryKey", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
-                <td>@Html.ActionLink("DropPrimaryKey", "DropPrimaryKey", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@using (Html.BeginForm("DropConstraint", "DBManager", new {@appName = item.Application.Name, @tableName = item.tableName, @isPrimaryKey = true}, FormMethod.Post, null))
+                    {
+                        <button type="submit">DropPrimaryKey</button>
+                    }</td>
                 <td>@Html.ActionLink("AddForeignKey", "CreateForeignKey", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("DropForeignKey", "DropForeignKey", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("DisableConstraints", "Constraint", new { @appName = item.Application.Name, @tableName = item.tableName, @isDisable = true })</td>

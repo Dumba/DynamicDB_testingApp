@@ -1,22 +1,20 @@
 ﻿@model Entitron.DBTable
 @{
-    ViewBag.Title = "DropForeignKey";
+    ViewBag.Title = "DropUnique";
 }
 
-<h2>DropForeignKey</h2>
+<h2>DropUnique</h2>
 @using (Html.BeginForm("DropConstraint", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, FormMethod.Post, null))
 {
     <table class="table table-bordered" id="mytable">
         <thead>
             <tr>
-                <th>Název cizího klíče</th>
-                <td>@Html.DropDownList("constraintName", new SelectList(ViewBag.foreignKeys, "Name"))</td>
+                <th>Název indexu</th>
+                <td>@Html.DropDownList("constraintName", new SelectList(ViewBag.Unique))</td>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
-    <button type="submit">Drop Foreign Key</button>
+    <button type="submit">Drop Unique</button>
     @Html.ActionLink("Back", "Index", new { @appName = Model.Application.Name })
 }
-
-
