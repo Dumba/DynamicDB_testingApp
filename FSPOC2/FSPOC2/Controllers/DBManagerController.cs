@@ -63,19 +63,30 @@ namespace FSPOC2.Controllers
                 };
 
                 model.Application = app;
+                List<string> unique = new List<string>();
+                //foreach (DBColumn c in model.columns)          vhodně ošetřit aby se název při vytvoření neobjevil 2x
+                //{
+                //    foreach (DBColumn d in model.columns)
+                //    {
+                //        if (c == d)
+                //        {
+                //            TempData["message-error"] = "Table " + model.tableName + " can not be created. Column name " +
+                //                                        c.Name + " is in table more then once.";
+                //            return RedirectToAction("Index", new { @appName = appName });
+                //        }
+                //    }
+                //}
+
+                model.Create();
                 foreach (DBColumn c in model.columns)
                 {
-                    foreach (DBColumn d in model.columns)
+                    if (c.isUnique )
                     {
-                        if (c == d)
-                        {
-                            TempData["message-error"] = "Table " + model.tableName + " can not be created. Column name" + c.Name + "is in table more then once.";
-                            return RedirectToAction("Index", new { @appName = appName });
-                        }
+                        unique.Add(c.Name);
+                        model.columns.AddUniqueValue(model.tableName + c.Name, unique);
+                        unique.Remove(c.Name);
                     }
                 }
-                model.Create();
-
                 app.SaveChanges();
                 TempData["message-success"] = "Table " + model.tableName + " was successfully created.";
                 return RedirectToAction("Index", new { @appName = appName });
@@ -443,70 +454,7 @@ namespace FSPOC2.Controllers
                 }
                 else
                 {
-                    switch (c.type.ToLower())
-                    {
-                        case "int":
-                            row[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
-                            break;
-                        case "bigint":
-                            row[c.Name] = Convert.ToInt64(fc.Get("col" + c.Name));
-                            break;
-                        case "smallint":
-                            row[c.Name] = Convert.ToInt16(fc.Get("col" + c.Name));
-                            break;
-                        case "tinyint":
-                            row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                            break;
-                        case "decimal":
-                            row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
-                            break;
-                        case "smallmoney":
-                            row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
-                            break;
-                        case "money":
-                            row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
-                            break;
-                        case "float":
-                            row[c.Name] = Convert.ToDouble(fc.Get("col" + c.Name));
-                            break;
-                        case "real":
-                            row[c.Name] = Convert.ToSingle(fc.Get("col" + c.Name));
-                            break;
-                        case "date":
-                            row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
-                            break;
-                        case "time":
-                            row[c.Name] = TimeSpan.Parse(fc.Get("col" + c.Name));
-                            break;
-                        case "datetime":
-                            row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
-                            break;
-                        case "datetime2":
-                            row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
-                            break;
-                        case "datetimeoffset":
-                            row[c.Name] = DateTimeOffset.Parse(fc.Get("col" + c.Name));
-                            break;
-                        case "timestamp":
-                            row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                            break;
-                        case "varbinary":
-                            row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                            break;
-                        case "bit":
-                            row[c.Name] = Convert.ToBoolean(fc.Get("col" + c.Name));
-                            break;
-                        case "binary":
-                            row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                            break;
-                        case "uniqueidentifier":
-                            row[c.Name] = Guid.Parse(fc.Get("col" + c.Name));
-                            break;
-                        default:
-                            row[c.Name] = fc.Get("col" + c.Name);
-                            break;
-
-                    }
+                    row[c.Name] = table.ConvertValue(c,fc.Get("col" + c.Name));
                 }
             }
 
@@ -530,69 +478,7 @@ namespace FSPOC2.Controllers
 
             foreach (DBColumn c in table.columns)//converting to right data type
             {
-                switch (c.type.ToLower())
-                {
-                    case "int":
-                        row[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
-                        break;
-                    case "bigint":
-                        row[c.Name] = Convert.ToInt64(fc.Get("col" + c.Name));
-                        break;
-                    case "smallint":
-                        row[c.Name] = Convert.ToInt16(fc.Get("col" + c.Name));
-                        break;
-                    case "tinyint":
-                        row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                        break;
-                    case "decimal":
-                        row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
-                        break;
-                    case "smallmoney":
-                        row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
-                        break;
-                    case "money":
-                        row[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
-                        break;
-                    case "float":
-                        row[c.Name] = Convert.ToDouble(fc.Get("col" + c.Name));
-                        break;
-                    case "real":
-                        row[c.Name] = Convert.ToSingle(fc.Get("col" + c.Name));
-                        break;
-                    case "date":
-                        row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
-                        break;
-                    case "time":
-                        row[c.Name] = TimeSpan.Parse(fc.Get("col" + c.Name));
-                        break;
-                    case "datetime":
-                        row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
-                        break;
-                    case "datetime2":
-                        row[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
-                        break;
-                    case "datetimeoffset":
-                        row[c.Name] = DateTimeOffset.Parse(fc.Get("col" + c.Name));
-                        break;
-                    case "timestamp":
-                        row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                        break;
-                    case "varbinary":
-                        row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                        break;
-                    case "bit":
-                        row[c.Name] = Convert.ToBoolean(fc.Get("col" + c.Name));
-                        break;
-                    case "binary":
-                        row[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                        break;
-                    case "uniqueidentifier":
-                        row[c.Name] = Guid.Parse(fc.Get("col" + c.Name));
-                        break;
-                    default:
-                        row[c.Name] = fc.Get("col" + c.Name);
-                        break;
-                }
+                row[c.Name] = table.ConvertValue(c, fc.Get("col" + c.Name));
                 TempData.Remove(c.Name);
                 TempData.Add(c.Name, row[c.Name]);
             }
@@ -625,69 +511,7 @@ namespace FSPOC2.Controllers
 
             foreach (DBColumn c in table.columns)//converting to right data type
             {
-                switch (c.type.ToLower())
-                {
-                    case "int":
-                        changes[c.Name] = Convert.ToInt32(fc.Get("col" + c.Name));
-                        break;
-                    case "bigint":
-                        changes[c.Name] = Convert.ToInt64(fc.Get("col" + c.Name));
-                        break;
-                    case "smallint":
-                        changes[c.Name] = Convert.ToInt16(fc.Get("col" + c.Name));
-                        break;
-                    case "tinyint":
-                        changes[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                        break;
-                    case "decimal":
-                        changes[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
-                        break;
-                    case "smallmoney":
-                        changes[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
-                        break;
-                    case "money":
-                        changes[c.Name] = Convert.ToDecimal(fc.Get("col" + c.Name));
-                        break;
-                    case "float":
-                        changes[c.Name] = Convert.ToDouble(fc.Get("col" + c.Name));
-                        break;
-                    case "real":
-                        changes[c.Name] = Convert.ToSingle(fc.Get("col" + c.Name));
-                        break;
-                    case "date":
-                        changes[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
-                        break;
-                    case "time":
-                        changes[c.Name] = TimeSpan.Parse(fc.Get("col" + c.Name));
-                        break;
-                    case "datetime":
-                        changes[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
-                        break;
-                    case "datetime2":
-                        changes[c.Name] = Convert.ToDateTime(fc.Get("col" + c.Name));
-                        break;
-                    case "datetimeoffset":
-                        changes[c.Name] = DateTimeOffset.Parse(fc.Get("col" + c.Name));
-                        break;
-                    case "timestamp":
-                        changes[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                        break;
-                    case "varbinary":
-                        changes[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                        break;
-                    case "bit":
-                        changes[c.Name] = Convert.ToBoolean(fc.Get("col" + c.Name));
-                        break;
-                    case "binary":
-                        changes[c.Name] = Convert.ToByte(fc.Get("col" + c.Name));
-                        break;
-                    case "uniqueidentifier":
-                        changes[c.Name] = Guid.Parse(fc.Get("col" + c.Name));
-                        break;
-                    default:
-                        changes[c.Name] = fc.Get("col" + c.Name);
-                        break;
-                }
+                changes[c.Name]=table.ConvertValue(c, fc.Get("col" + c.Name));
                 oldVal[c.Name] = TempData[c.Name];
             }
             table.Update(changes, oldVal);
@@ -829,70 +653,8 @@ namespace FSPOC2.Controllers
 
             DBTable table = app.GetTable(tableName);
             DBColumn c = table.columns.SingleOrDefault(s => s.Name == defaultColumn);
-            object val;
-            switch (c.type.ToLower())
-                {
-                    case "int":
-                        val = Convert.ToInt32(value);
-                        break;
-                    case "bigint":
-                        val= Convert.ToInt64(value);
-                        break;
-                    case "smallint":
-                        val=Convert.ToInt16(value);
-                        break;
-                    case "tinyint":
-                        val=Convert.ToByte(value);
-                        break;
-                    case "decimal":
-                        val=Convert.ToDecimal(value);
-                        break;
-                    case "smallmoney":
-                        val=Convert.ToDecimal(value);
-                        break;
-                    case "money":
-                        val=Convert.ToDecimal(value);
-                        break;
-                    case "float":
-                        val=Convert.ToDouble(value);
-                        break;
-                    case "real":
-                        val=Convert.ToSingle(value);
-                        break;
-                    case "date":
-                        val = Convert.ToDateTime(value);
-                        break;
-                    case "time":
-                        val = TimeSpan.Parse(value);
-                        break;
-                    case "datetime":
-                        val = Convert.ToDateTime(value);
-                        break;
-                    case "datetime2":
-                        val = Convert.ToDateTime(value);
-                        break;
-                    case "datetimeoffset":
-                        val = DateTimeOffset.Parse(value);
-                        break;
-                    case "timestamp":
-                        val = Convert.ToByte(value);
-                        break;
-                    case "varbinary":
-                        val = Convert.ToByte(value);
-                        break;
-                    case "bit":
-                        val= Convert.ToBoolean(value);
-                        break;
-                    case "binary":
-                        val = Convert.ToByte(value);
-                        break;
-                    case "uniqueidentifier":
-                        val = Guid.Parse(value);
-                        break;
-                    default:
-                        val = value;
-                        break;
-                }
+            object val = table.ConvertValue(c, value);
+
             table.columns.AddDefaultValue(defaultColumn, val);
             app.SaveChanges();
             return RedirectToAction("Index", new {@appName = appName});
