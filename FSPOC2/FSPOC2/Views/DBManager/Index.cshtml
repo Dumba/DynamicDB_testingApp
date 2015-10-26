@@ -23,7 +23,7 @@ else if (TempData["message-error"] != null)
     <thead>
         <tr>
             <th>Table Name</th>
-            <th colspan="14">Actions</th>
+            <th colspan="15">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -39,6 +39,7 @@ else if (TempData["message-error"] != null)
                 <td>@Html.ActionLink("DropUnique", "DropUnique", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("AddDefault", "CreateDefault", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("DropDefault", "DropDefault", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
+                <td>@Html.ActionLink("AddCheck", "CreateCheck", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@Html.ActionLink("AddPrimaryKey", "CreatePrimaryKey", new { @appName = item.Application.Name, @tableName = item.tableName })</td>
                 <td>@using (Html.BeginForm("DropConstraint", "DBManager", new {@appName = item.Application.Name, @tableName = item.tableName, @isPrimaryKey = true}, FormMethod.Post, null))
                     {

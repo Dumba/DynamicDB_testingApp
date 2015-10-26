@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using FSPOC2.Models;
 using Entitron;
+using Entitron.Sql;
 using Microsoft.SqlServer.Server;
 
 namespace FSPOC2.Controllers
@@ -63,28 +64,32 @@ namespace FSPOC2.Controllers
                 };
 
                 model.Application = app;
-                List<string> unique = new List<string>();
-                //foreach (DBColumn c in model.columns)          vhodně ošetřit aby se název při vytvoření neobjevil 2x
-                //{
-                //    foreach (DBColumn d in model.columns)
-                //    {
-                //        if (c == d)
-                //        {
-                //            TempData["message-error"] = "Table " + model.tableName + " can not be created. Column name " +
-                //                                        c.Name + " is in table more then once.";
-                //            return RedirectToAction("Index", new { @appName = appName });
-                //        }
-                //    }
-                //}
+                foreach (DBColumn c in model.columns)
+                {
+                    int p = 0;
+                    foreach (DBColumn d in model.columns)
+                    {
+                        if (c == d)
+                        {
+                            p = p + 1;
+                            if (p == 2)
+                            {
+                                TempData["message-error"] = "Table " + model.tableName + " can not be created. Column name " +
+                                                        c.Name + " is in table more then once.";
+                                return RedirectToAction("Index", new { @appName = appName });
+                            }            
+                        }
+                    }
+                }
 
                 model.Create();
                 foreach (DBColumn c in model.columns)
                 {
+                    List<string> unique = new List<string>();
                     if (c.isUnique )
                     {
                         unique.Add(c.Name);
                         model.columns.AddUniqueValue(model.tableName + c.Name, unique);
-                        unique.Remove(c.Name);
                     }
                 }
                 app.SaveChanges();
@@ -436,15 +441,20 @@ namespace FSPOC2.Controllers
             };
 
             DBTable table = app.GetTable(tableName);
-            foreach (DBIndex index in table.indices) //condition for cluster, you can not insert/update/delete without cluster in Azure
+            bool isClusterIndex = false;
+            foreach (DBIndex index in table.indices) //looking for cluster index between all indeces
             {
                 if (index.indexName == "index_" + appName + tableName)
                 {
-                    TempData["message-error"] = "Row can not be inserted, because table does not have a cluster index. The cluster index is created when you first create a primary key.";
-                    return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
+                    isClusterIndex = true;
+                    break;
                 }
             }
-
+            if (!isClusterIndex)//condition for cluster, you can not insert/update/delete without cluster in Azure
+            {
+                TempData["message-error"] = "Row can not be inserted, because table does not have a cluster index. The cluster index is created when you first create a primary key.";
+                return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
+            }
             DBItem row = new DBItem();
             foreach (DBColumn c in table.columns)  //converting to right data type
             {
@@ -637,7 +647,6 @@ namespace FSPOC2.Controllers
                 Name = appName,
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
-
             DBTable table = app.GetTable(tableName);
             return View(table);
         }
@@ -668,6 +677,11 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
+            if (table.columns.GetDefaults().Count == 0)
+            {
+                TempData["message-error"] = "Table has no default value to drop.";
+                return RedirectToAction("Index", new { @appName = appName });
+            }
             ViewBag.Defaults = table.columns.GetDefaults();
             return View(table);
         }
@@ -684,7 +698,7 @@ namespace FSPOC2.Controllers
             {
                 if (table.primaryKeys.Count == 0)
                 {
-                    TempData["message-error"] = "Table has no constraint to enable.";
+                    TempData["message-error"] = "Table has no primary key to drop.";
                     return RedirectToAction("Index", new {@appName = appName});
                 }
             }
@@ -693,6 +707,33 @@ namespace FSPOC2.Controllers
             TempData["message-success"] = "Constraint was successfully dropped.";
             return RedirectToAction("Index", new { @appName = appName });
         }
+
+        public ActionResult CreateCheck(string appName, string tableName)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
+            ViewBag.Column = table.columns.Select(x=>x.Name);
+            ViewBag.Operators = table.GetOperators();
+            return View("AddCheck",table);
+        }
+        [HttpPost]
+        public ActionResult AddCheck(string appName, string tableName, string column, string conOperator, string value)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
+            DBColumn col = table.columns.SingleOrDefault(x => x.Name == column);
+            object val = table.ConvertValue(col, value);
+            return RedirectToAction("Index", new { @appName = appName });
+        }
+
         public JsonResult getTableColumns(string tableName, string appName)
         {
             DBApp app = new DBApp()

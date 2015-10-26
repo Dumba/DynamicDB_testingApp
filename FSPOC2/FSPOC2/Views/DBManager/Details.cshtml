@@ -75,7 +75,6 @@
                 <th>Max Length</th>
                 <th>Precision</th>
                 <th>Scale</th>
-                <th>Unique</th>
                 <th>Can be null?</th>
                 <th>Action</th>
             </tr>
@@ -89,7 +88,6 @@
                     <td>@Html.DisplayFor(c => c.columns[t].maxLength)</td>
                     <td>@Html.DisplayFor(c => c.columns[t].precision)</td>
                     <td>@Html.DisplayFor(c => c.columns[t].scale)</td>
-                    <td>@Html.DisplayFor(c => c.columns[t].isUnique)</td>
                     <td>@Html.DisplayFor(c => c.columns[t].canBeNull)</td>
                 <td>
                     @Html.ActionLink("Drop column", "DropColumn", new {@tableName = Model.tableName, @appName = Request["appName"], @columnName = Model.columns[t].Name}, new {@class = "btn btn-danger"})
