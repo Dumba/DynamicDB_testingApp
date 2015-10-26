@@ -64,15 +64,24 @@ namespace FSPOC2.Controllers
                 };
 
                 model.Application = app;
-                foreach (DBColumn c in model.columns)
+                foreach (DBTable t in app.GetTables())//can not create table with name, which is already exist
+                {
+                    if (t.tableName == model.tableName)
+                    {
+                        TempData["message-error"] = "Table " + model.tableName + " can not be created. Table name " +
+                        model.tableName + " is already exist.";
+                        return RedirectToAction("Index", new { @appName = appName });
+                    }
+                }
+                foreach (DBColumn c in model.columns)//column name must be unique in table, int p is for situation, when column is compared with itself 
                 {
                     int p = 0;
                     foreach (DBColumn d in model.columns)
                     {
-                        if (c == d)
+                        if (c.Name == d.Name)
                         {
                             p = p + 1;
-                            if (p == 2)
+                            if (p > 1)
                             {
                                 TempData["message-error"] = "Table " + model.tableName + " can not be created. Column name " +
                                                         c.Name + " is in table more then once.";
@@ -83,7 +92,7 @@ namespace FSPOC2.Controllers
                 }
 
                 model.Create();
-                foreach (DBColumn c in model.columns)
+                foreach (DBColumn c in model.columns)//every colum with isUnique=true add query for AddUniqueValue into queries
                 {
                     List<string> unique = new List<string>();
                     if (c.isUnique )
@@ -167,12 +176,12 @@ namespace FSPOC2.Controllers
             };
             DBTable table = app.GetTable(tableName);
 
-            if (table.Select().ToList().Count != 0 && column.canBeNull == false)
+            if (table.Select().ToList().Count != 0 && column.canBeNull == false)//condition for not null column, which can be created only in empty table
             {
                 TempData["message-error"] = "Table " + tableName + " must be empty if you want to add NOT NULL column.";
                 return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
             }
-            else if (table.columns.SingleOrDefault(x => x.Name == column.Name) != null)
+            else if (table.columns.SingleOrDefault(x => x.Name == column.Name) != null)//condition for column name, column name can not be equal with other names in table
             {
                 TempData["message-error"] = "Table " + tableName + " has already column with name " + column.Name + ".";
                 return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
@@ -194,11 +203,10 @@ namespace FSPOC2.Controllers
             };
             DBTable table = app.GetTable(tableName);
             DBColumn col = table.columns.SingleOrDefault(c => c.Name == columnName);
-            TempData.Remove("oldColumnName");
+            TempData.Remove("oldColumnName");//remove old value (if exist)
             TempData.Add("oldColumnName",columnName);
-            //foreach pro korekci názvů sloupců, název sloupce který upravujeme nekontrolujeme, zbytek ano
 
-            foreach (DBColumn c in table.columns)
+            foreach (DBColumn c in table.columns) //create collection for columns name, collection does not contain column name of altering column
             {
                 TempData.Remove(c.Name);
                 if (col != c)
@@ -220,7 +228,7 @@ namespace FSPOC2.Controllers
             };
             DBTable table = app.GetTable(tableName);
             
-            foreach (string s in TempData.Keys)
+            foreach (string s in TempData.Keys)//column names control with other names in table
             {
                 if (s == column.Name)
                 {
@@ -244,9 +252,7 @@ namespace FSPOC2.Controllers
                                 return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
                             }
                         }
-                        
                     }
-
                 }
             }
             if (column.Name!=TempData["oldColumnName"].ToString())
@@ -295,6 +301,18 @@ namespace FSPOC2.Controllers
             };
 
             DBTable table = app.GetTable(tableName);
+            foreach (DBTable t in app.GetTables())
+            {
+                foreach (DBIndex index in t.indices)
+                {
+                    if (index.indexName == "index_" + fc["indexName"])
+                    {
+                        TempData["message-error"] = "Index constraint with name index_" + fc["indexName"] + " is already exist.";
+                        return RedirectToAction("Index", new { @appName = appName });
+                    }
+                }
+            }
+            
             table.indices.AddToDB(fc["indexName"], indexColumns);
             app.SaveChanges();
 
@@ -367,7 +385,17 @@ namespace FSPOC2.Controllers
                 Name = appName,
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
-
+            foreach (DBTable t in app.GetTables())
+            {
+                foreach (DBForeignKey foreignKey in t.foreignKeys)
+                {
+                    if (foreignKey.name== "FK_"+model.name)
+                    {
+                        TempData["message-error"] = "Foreign key with name FK_" + model.name + " is already exist.";
+                        return RedirectToAction("Index", new { @appName = appName });
+                    }
+                }
+            }
             DBTable sTable = app.GetTable(model.sourceTable.tableName);
             DBTable tTable = app.GetTable(model.targetTable.tableName);
             DBColumn sColumn = sTable.columns.SingleOrDefault(x => x.Name == model.sourceColumn);
