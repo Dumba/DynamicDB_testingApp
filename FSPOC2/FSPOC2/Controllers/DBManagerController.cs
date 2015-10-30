@@ -238,7 +238,7 @@ namespace FSPOC2.Controllers
                 }
             }
 
-            if (column.canBeNull != true)
+            if (column.canBeNull != true)//column can not has NULL in definition, if it has null values
             {
                 foreach (DBItem i in table.Select().ToList())
                 {
@@ -255,7 +255,7 @@ namespace FSPOC2.Controllers
                     }
                 }
             }
-            if (column.Name!=TempData["oldColumnName"].ToString())
+            if (column.Name!=TempData["oldColumnName"].ToString()) //rename column is not part of ModifyInDB operation, that why is this condition used
             {
                 table.columns.RenameInDB(TempData["oldColumnName"].ToString(), column.Name);
             }
@@ -301,7 +301,7 @@ namespace FSPOC2.Controllers
             };
 
             DBTable table = app.GetTable(tableName);
-            foreach (DBTable t in app.GetTables())
+            foreach (DBTable t in app.GetTables())  //constraint name control for all tables in aplication
             {
                 foreach (DBIndex index in t.indices)
                 {
@@ -330,7 +330,7 @@ namespace FSPOC2.Controllers
             DBTable table = app.GetTable(tableName);
             List<string> indexNames = new List<string>();
 
-            foreach (DBIndex index in table.indices)
+            foreach (DBIndex index in table.indices) //user can not drop cluster index, this foreach add every indexName into the list except cluster index´s name
             {
                 if (index.indexName != "index_" + appName + tableName)
                 {
@@ -387,7 +387,7 @@ namespace FSPOC2.Controllers
             };
             foreach (DBTable t in app.GetTables())
             {
-                foreach (DBForeignKey foreignKey in t.foreignKeys)
+                foreach (DBForeignKey foreignKey in t.foreignKeys) //constraint name control for all tables in application
                 {
                     if (foreignKey.name== "FK_"+model.name)
                     {
@@ -421,7 +421,7 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            if (table.foreignKeys.GetForeignKeyForDrop().Count != 0)
+            if (table.foreignKeys.GetForeignKeyForDrop().Count != 0) //if there are not foreign keys, is no need to continue into the view for drop
             {
                 ViewBag.foreignKeys = table.foreignKeys.GetForeignKeyForDrop();
                 return View(table);
@@ -520,7 +520,7 @@ namespace FSPOC2.Controllers
                 TempData.Remove(c.Name);
                 TempData.Add(c.Name, row[c.Name]);
             }
-            if (fc.Get("Update") != null)
+            if (fc.Get("Update") != null) 
             {
                 ViewBag.Row = row.getAllProperties();
                 return View("UpdateView", table);
@@ -598,8 +598,8 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-
             string constraintName = (fc["all"] != null) ? "ALL" : fc["constraintName"];
+
             if (isDisable)
             {
                 table.DisableConstraint(constraintName);
@@ -637,7 +637,7 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            foreach (string s in table.columns.GetUniqueConstrainst(true))
+            foreach (string s in table.columns.GetUniqueConstrainst(true)) //constraint name control for all tables in application
             {
                 if (s =="UN_" + uniqueName)
                 {
@@ -660,7 +660,7 @@ namespace FSPOC2.Controllers
             };
 
             DBTable table = app.GetTable(tableName);
-            if (table.columns.GetUniqueConstrainst().Count == 0)
+            if (table.columns.GetUniqueConstrainst().Count == 0) //if there are not unique constraints, is no need to continue into the view for drop
             {
                 TempData["message-error"] = "Table has no unique constraint.";
                 return RedirectToAction("Index", new {@appName = appName});
@@ -705,7 +705,7 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            if (table.columns.GetDefaults().Count == 0)
+            if (table.columns.GetDefaults().Count == 0) //constraint name control 
             {
                 TempData["message-error"] = "Table has no default value to drop.";
                 return RedirectToAction("Index", new { @appName = appName });
@@ -722,9 +722,9 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            if (isPrimaryKey == true)
+            if (isPrimaryKey == true) 
             {
-                if (table.primaryKeys.Count == 0)
+                if (table.primaryKeys.Count == 0) //constraint name control 
                 {
                     TempData["message-error"] = "Table has no primary key to drop.";
                     return RedirectToAction("Index", new {@appName = appName});
