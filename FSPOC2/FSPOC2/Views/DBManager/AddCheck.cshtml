@@ -5,8 +5,16 @@
  }
 
 <h2>AddCheck</h2>
-@using (Html.BeginForm("AddCheck", "DBManager", new { @appName = Model.Application, @tableName = Model.tableName }, FormMethod.Post, null))
+@using (Html.BeginForm("AddCheck", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, FormMethod.Post, null))
 {
+    <div class="form-group row">
+        <div class="col-sm-2">
+            <label class="control-label">Check name</label>
+        </div>
+        <div class="col-sm-3">
+            @Html.TextBox("checkName")
+        </div>
+    </div>
     <div class="form-group row">
         <div class="col-sm-2">
             <label class="control-label">Column</label>

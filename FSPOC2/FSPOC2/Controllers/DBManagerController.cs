@@ -749,7 +749,7 @@ namespace FSPOC2.Controllers
             return View("AddCheck",table);
         }
         [HttpPost]
-        public ActionResult AddCheck(string appName, string tableName, string column, string conOperator, string value)
+        public ActionResult AddCheck(string appName, string tableName, string checkName, string column, string conOperator, string value)
         {
             DBApp app = new DBApp()
             {
@@ -759,6 +759,12 @@ namespace FSPOC2.Controllers
             DBTable table = app.GetTable(tableName);
             DBColumn col = table.columns.SingleOrDefault(x => x.Name == column);
             object val = table.ConvertValue(col, value);
+            Conditions con=new Conditions(new SqlQuery());
+            con.column(col.Name);
+            con.isCheck = true;
+            Condition_Operators ope = table.GetConditionOperators(con, conOperator, val);
+            table.AddCheck(checkName, ope);
+            app.SaveChanges();
             return RedirectToAction("Index", new { @appName = appName });
         }
 
