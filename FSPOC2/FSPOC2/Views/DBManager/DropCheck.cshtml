@@ -1,0 +1,25 @@
+﻿@model Entitron.DBTable
+@{
+    ViewBag.Title = "DropCheck";
+}
+
+<h2>DropCheck</h2>
+@using (Html.BeginForm("DropConstraint", "DBManager", new { @appName = Model.Application.Name, @tableName = Model.tableName }, FormMethod.Post, null))
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Column</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="ColumnTemplate">@Html.DropDownList("constraintName", new SelectList(ViewBag.Check))</td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit">Drop Check</button>
+    @Html.ActionLink("Back", "Index", new { @appName = Model.Application.Name })
+}
+
+

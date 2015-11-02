@@ -309,6 +309,7 @@
     <Content Include="Views\DBManager\CreateDefault.cshtml" />
     <Content Include="Views\DBManager\DropDefault.cshtml" />
     <Content Include="Views\DBManager\AddCheck.cshtml" />
+    <Content Include="Views\DBManager\DropCheck.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -86,7 +86,7 @@ namespace FSPOC2.Controllers
                                 TempData["message-error"] = "Table " + model.tableName + " can not be created. Column name " +
                                                         c.Name + " is in table more then once.";
                                 return RedirectToAction("Index", new { @appName = appName });
-                            }            
+                            }
                         }
                     }
                 }
@@ -95,7 +95,7 @@ namespace FSPOC2.Controllers
                 foreach (DBColumn c in model.columns)//every colum with isUnique=true add query for AddUniqueValue into queries
                 {
                     List<string> unique = new List<string>();
-                    if (c.isUnique )
+                    if (c.isUnique)
                     {
                         unique.Add(c.Name);
                         model.columns.AddUniqueValue(model.tableName + c.Name, unique);
@@ -204,14 +204,14 @@ namespace FSPOC2.Controllers
             DBTable table = app.GetTable(tableName);
             DBColumn col = table.columns.SingleOrDefault(c => c.Name == columnName);
             TempData.Remove("oldColumnName");//remove old value (if exist)
-            TempData.Add("oldColumnName",columnName);
+            TempData.Add("oldColumnName", columnName);
 
             foreach (DBColumn c in table.columns) //create collection for columns name, collection does not contain column name of altering column
             {
                 TempData.Remove(c.Name);
                 if (col != c)
                 {
-                    TempData.Add(c.Name,c.Name);
+                    TempData.Add(c.Name, c.Name);
                 }
             }
 
@@ -227,7 +227,7 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            
+
             foreach (string s in TempData.Keys)//column names control with other names in table
             {
                 if (s == column.Name)
@@ -246,7 +246,7 @@ namespace FSPOC2.Controllers
                     {
                         if (c.Name == column.Name)
                         {
-                            if (i[column.Name] == null || i[column.Name]=="")
+                            if (i[column.Name] == null || i[column.Name] == "")
                             {
                                 TempData["message-error"] = "Column " + column.Name + " can not be null. It has null values.";
                                 return RedirectToAction("Details", new { @appName = appName, @tableName = tableName });
@@ -255,7 +255,7 @@ namespace FSPOC2.Controllers
                     }
                 }
             }
-            if (column.Name!=TempData["oldColumnName"].ToString()) //rename column is not part of ModifyInDB operation, that why is this condition used
+            if (column.Name != TempData["oldColumnName"].ToString()) //rename column is not part of ModifyInDB operation, that why is this condition used
             {
                 table.columns.RenameInDB(TempData["oldColumnName"].ToString(), column.Name);
             }
@@ -312,7 +312,7 @@ namespace FSPOC2.Controllers
                     }
                 }
             }
-            
+
             table.indices.AddToDB(fc["indexName"], indexColumns);
             app.SaveChanges();
 
@@ -389,7 +389,7 @@ namespace FSPOC2.Controllers
             {
                 foreach (DBForeignKey foreignKey in t.foreignKeys) //constraint name control for all tables in application
                 {
-                    if (foreignKey.name== "FK_"+model.name)
+                    if (foreignKey.name == "FK_" + model.name)
                     {
                         TempData["message-error"] = "Foreign key with name FK_" + model.name + " is already exist.";
                         return RedirectToAction("Index", new { @appName = appName });
@@ -492,12 +492,12 @@ namespace FSPOC2.Controllers
                 }
                 else
                 {
-                    row[c.Name] = table.ConvertValue(c,fc.Get("col" + c.Name));
+                    row[c.Name] = table.ConvertValue(c, fc.Get("col" + c.Name));
                 }
             }
 
             table.Add(row);
-            app.SaveChanges(); 
+            app.SaveChanges();
             TempData["message-success"] = "Row was successfully inserted.";
             return RedirectToAction("Data", new { @appName = appName, @tableName = tableName });
         }
@@ -520,7 +520,7 @@ namespace FSPOC2.Controllers
                 TempData.Remove(c.Name);
                 TempData.Add(c.Name, row[c.Name]);
             }
-            if (fc.Get("Update") != null) 
+            if (fc.Get("Update") != null)
             {
                 ViewBag.Row = row.getAllProperties();
                 return View("UpdateView", table);
@@ -549,7 +549,7 @@ namespace FSPOC2.Controllers
 
             foreach (DBColumn c in table.columns)//converting to right data type
             {
-                changes[c.Name]=table.ConvertValue(c, fc.Get("col" + c.Name));
+                changes[c.Name] = table.ConvertValue(c, fc.Get("col" + c.Name));
                 oldVal[c.Name] = TempData[c.Name];
             }
             table.Update(changes, oldVal);
@@ -639,16 +639,16 @@ namespace FSPOC2.Controllers
             DBTable table = app.GetTable(tableName);
             foreach (string s in table.columns.GetUniqueConstrainst(true)) //constraint name control for all tables in application
             {
-                if (s =="UN_" + uniqueName)
+                if (s == "UN_" + uniqueName)
                 {
-                    TempData["message-error"] = "Unique constraint with name UN_"+uniqueName+" is already exist.";
+                    TempData["message-error"] = "Unique constraint with name UN_" + uniqueName + " is already exist.";
                     return RedirectToAction("Index", new { @appName = appName });
                 }
             }
             table.columns.AddUniqueValue(uniqueName, uniqueColumns);
             app.SaveChanges();
             TempData["message-success"] = "Column(s) " + string.Join(", ", uniqueColumns) + " is/are unique.";
-            return RedirectToAction("Index", new{@appName=appName});
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult DropUnique(string appName, string tableName)
@@ -663,9 +663,9 @@ namespace FSPOC2.Controllers
             if (table.columns.GetUniqueConstrainst().Count == 0) //if there are not unique constraints, is no need to continue into the view for drop
             {
                 TempData["message-error"] = "Table has no unique constraint.";
-                return RedirectToAction("Index", new {@appName = appName});
+                return RedirectToAction("Index", new { @appName = appName });
             }
-            ViewBag.Unique=table.columns.GetUniqueConstrainst();
+            ViewBag.Unique = table.columns.GetUniqueConstrainst();
             return View(table);
         }
         public ActionResult CreateDefault(string appName, string tableName)
@@ -694,7 +694,7 @@ namespace FSPOC2.Controllers
 
             table.columns.AddDefaultValue(defaultColumn, val);
             app.SaveChanges();
-            return RedirectToAction("Index", new {@appName = appName});
+            return RedirectToAction("Index", new { @appName = appName });
         }
 
         public ActionResult DropDefault(string tableName, string appName)
@@ -722,15 +722,15 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            if (isPrimaryKey == true) 
+            if (isPrimaryKey == true)
             {
                 if (table.primaryKeys.Count == 0) //constraint name control 
                 {
                     TempData["message-error"] = "Table has no primary key to drop.";
-                    return RedirectToAction("Index", new {@appName = appName});
+                    return RedirectToAction("Index", new { @appName = appName });
                 }
             }
-            table.DropConstraint(constraintName,isPrimaryKey);
+            table.DropConstraint(constraintName, isPrimaryKey);
             app.SaveChanges();
             TempData["message-success"] = "Constraint was successfully dropped.";
             return RedirectToAction("Index", new { @appName = appName });
@@ -744,12 +744,12 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            ViewBag.Column = table.columns.Select(x=>x.Name);
+            ViewBag.Column = table.columns.Select(x => x.Name);
             ViewBag.Operators = table.GetOperators();
-            return View("AddCheck",table);
+            return View("AddCheck", table);
         }
         [HttpPost]
-        public ActionResult AddCheck(string appName, string tableName, string checkName, string column, string conOperator, string value)
+        public ActionResult AddCheck(string appName, string tableName, FormCollection fc)
         {
             DBApp app = new DBApp()
             {
@@ -757,17 +757,54 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            DBColumn col = table.columns.SingleOrDefault(x => x.Name == column);
-            object val = table.ConvertValue(col, value);
-            Conditions con=new Conditions(new SqlQuery());
-            con.column(col.Name);
-            con.isCheck = true;
-            Condition_Operators ope = table.GetConditionOperators(con, conOperator, val);
-            table.AddCheck(checkName, ope);
+            foreach (DBTable t in app.GetTables())
+            {
+                foreach (string checkConstraint in t.GetCheckConstraints()) //constraint name control for all tables in application
+                {
+                    if (checkConstraint == "CHK_" + fc["checkName"])
+                    {
+                        TempData["message-error"] = "Check constraint with name " + checkConstraint + " is already exist.";
+                        return RedirectToAction("Index", new { @appName = appName });
+                    }
+                }
+            }
+
+            int i = 0;
+            Conditions con = new Conditions(new SqlQuery());
+            Condition_Operators ope=new Condition_Operators(con);                    
+            Condition_concat concat=new Condition_concat(con);
+            while (fc["column[" + i + "]"] != null)
+            {
+                DBColumn col = table.columns.SingleOrDefault(x => x.Name == fc["column[" + i + "]"]);
+                object val = table.ConvertValue(col, fc["value[" + i + "]"]);
+                con.column(col.Name);
+                con.isCheck = true;
+                if (i != 0) concat.and();
+                ope = table.GetConditionOperators(con, fc["conOperator[" + i + "]"], val);
+                i++;
+            }
+            table.AddCheck(fc["checkName"], con);
             app.SaveChanges();
+            TempData["message-success"] = "Check constraint " + fc["checkName"] + " was successfully added into table "+tableName+".";
             return RedirectToAction("Index", new { @appName = appName });
         }
 
+        public ActionResult DropCheck(string tableName, string appName)
+        {
+            DBApp app = new DBApp()
+            {
+                Name = appName,
+                ConnectionString = (new Entities()).Database.Connection.ConnectionString
+            };
+            DBTable table = app.GetTable(tableName);
+            if (table.GetCheckConstraints().Count == 0)//is there some check constraint to drop?
+            {
+                TempData["message-error"] = "Table has no check constraint to drop.";
+                return RedirectToAction("Index", new { @appName = appName });
+            }
+            ViewBag.Check = table.GetCheckConstraints();
+            return View(table);
+        }
         public JsonResult getTableColumns(string tableName, string appName)
         {
             DBApp app = new DBApp()
