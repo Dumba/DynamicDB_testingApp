@@ -34,6 +34,6 @@
         </tbody>
     </table>
     <button type="submit">Create Primary Key</button>
-    @Html.ActionLink("Back", "Index", new { @appName = Model.Application.Name })
+    @Html.ActionLink("Back", "Index", new { @appName = Request["appName"] }, new { @class = "btn btn-default" })
 }
 

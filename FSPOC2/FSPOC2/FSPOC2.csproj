@@ -310,6 +310,7 @@
     <Content Include="Views\DBManager\DropDefault.cshtml" />
     <Content Include="Views\DBManager\AddCheck.cshtml" />
     <Content Include="Views\DBManager\DropCheck.cshtml" />
+    <Content Include="Views\DBManager\InsertSelect.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

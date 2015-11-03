@@ -1,0 +1,106 @@
+﻿@model Entitron.DBTable
+@{
+    ViewBag.Title = "InsertSelect";
+}
+<script type="text/javascript">
+    $(function () {
+        $(document).on('change', '#tableB', function () {
+            $.getJSON('/DBManager/getTableColumns?appName=@(Request["appName"])&tableName=' + $(this).val(), function (data) {
+                $('#columnsB').html('');
+                $.each(data, function (i, item) {
+                    $('#columnsB').append('<option>' + item + '</option>');
+                });
+            });
+        });
+        $('#tableB').change();
+    });
+
+    $(document).ready(function () {
+        $("#btnAddColumn").click(function () {
+            $('#ColumnTemplate1').clone(true).insertAfter('#ColumnTemplate1')
+            $('#ColumnTemplate2').clone(true).insertAfter('#ColumnTemplate2')
+            return false;
+        });
+    });
+
+    $(document).ready(function () {
+        function reindex($row, newId) {
+            $row.find('input, select').each(function () {
+                this.name = this.name.replace(/\[[0-9]+\]/, '[' + newId + ']');
+            });
+            $row.attr('data-id', newId);
+        }
+        function reindexAll() {
+            $('#newAdd tr[data-id]').each(function (index) {
+                reindex($(this), index);
+            });
+        }
+
+        $('#btnAddOperator').click(function () {
+            var $table = $('#newAdd');
+            var columnCount = $table.find('tr[data-id]').length;
+            var nextId = columnCount; // index začíná 0
+
+            var $newRow = $('#newOperator').clone();
+            reindex($newRow, nextId);
+            $newRow.find('input, select').attr('disabled', false);
+            $newRow.removeAttr('id style');
+            $table.append($newRow);
+            return false;
+        });
+
+        //$(document).on('click', '.btnRemoveColumn', function () {
+        //    $(this).parents('tr').eq(0).remove();
+        //    reindexAll();
+        //    return false;
+        //});
+
+    });
+
+
+</script>
+
+<h2>InsertSelect</h2>
+@using (Html.BeginForm("InsertSelect", "DBManager", new { @appName = Model.Application.Name, @Model.tableName }, FormMethod.Post, null))
+{
+    <table class="table table-bordered" id="newAdd">
+        <thead>
+            <tr>
+                <th colspan="2">Insert into table</th>
+            <tr>
+                <td>@Html.DisplayFor(x => x.tableName)</td>
+                <td id="ColumnTemplate1">@Html.DropDownList("columnsA", new SelectList(Model.columns.Select(x => x.Name)))</td>
+            </tr>
+            <tr>
+                <th colspan="2">Select table</th>
+            </tr>
+            <tr>
+                <td>@Html.DropDownList("tableB", new SelectList(Model.Application.GetTables()))</td>
+                <td id="ColumnTemplate2">@Html.DropDownList("columnsB", new SelectList(new List<string>()))</td>
+            </tr>
+            <tr>
+                <td><button id="btnAddColumn" class="btn btn-success">Add Column</button></td>
+                <td>
+                    <button id="btnAddOperator" class="btn btn-success">AND</button>
+                </td>
+            </tr>
+        </thead>
+        <tbody id="newOperator">
+            <tr data-id="0">
+                <td rowspan="3">Where Clause</td>
+                <td>
+                    @Html.DropDownList("column[0]", new SelectList(Model.columns.Select(x => x.Name)))
+                </td>
+                <td>
+                    @Html.DropDownList("conOperator[0]", new SelectList(ViewBag.Operators))
+                </td>
+                <td>
+                    @Html.TextBox("value[0]")
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Insert</button>
+    @Html.ActionLink("Back", "Index", new { @appName = Request["appName"] }, new { @class = "btn btn-default" })
+}
