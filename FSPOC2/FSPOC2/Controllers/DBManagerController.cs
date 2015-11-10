@@ -98,7 +98,7 @@ namespace FSPOC2.Controllers
                     if (c.isUnique)
                     {
                         unique.Add(c.Name);
-                        model.columns.AddUniqueValue(model.tableName + c.Name, unique);
+                        model.columns.AddUniqueValue(c.Name, unique);
                     }
                 }
                 app.SaveChanges();
@@ -301,15 +301,12 @@ namespace FSPOC2.Controllers
             };
 
             DBTable table = app.GetTable(tableName);
-            foreach (DBTable t in app.GetTables())  //constraint name control for all tables in aplication
+            foreach (DBIndex index in table.indices)//constraint name control for in table
             {
-                foreach (DBIndex index in t.indices)
+                if (index.indexName == "index_" + appName + "_" + tableName + "_" + fc["indexName"])
                 {
-                    if (index.indexName == "index_" + appName + "_" + fc["indexName"])
-                    {
-                        TempData["message-error"] = "Index constraint with name index_" + fc["indexName"] + " is already exist.";
-                        return RedirectToAction("Index", new { @appName = appName });
-                    }
+                    TempData["message-error"] = "Index constraint with name " + index.indexName + " is already exist.";
+                    return RedirectToAction("Index", new { @appName = appName });
                 }
             }
 
@@ -385,18 +382,16 @@ namespace FSPOC2.Controllers
                 Name = appName,
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
-            foreach (DBTable t in app.GetTables())
+            DBTable sTable = app.GetTable(model.sourceTable.tableName);
+
+            foreach (DBForeignKey foreignKey in sTable.foreignKeys) //constraint name control in table
             {
-                foreach (DBForeignKey foreignKey in t.foreignKeys) //constraint name control for all tables in application
+                if (foreignKey.name == "FK_" + appName + "_" + model.sourceTable.tableName + "_" + model.name)
                 {
-                    if (foreignKey.name == "FK_" + appName + "_" + model.name)
-                    {
-                        TempData["message-error"] = "Foreign key with name FK_" + model.name + " is already exist.";
-                        return RedirectToAction("Index", new { @appName = appName });
-                    }
+                    TempData["message-error"] = "Foreign key with name " + foreignKey.name + " is already exist.";
+                    return RedirectToAction("Index", new { @appName = appName });
                 }
             }
-            DBTable sTable = app.GetTable(model.sourceTable.tableName);
             DBTable tTable = app.GetTable(model.targetTable.tableName);
             DBColumn sColumn = sTable.columns.SingleOrDefault(x => x.Name == model.sourceColumn);
             DBColumn tColumn = tTable.columns.SingleOrDefault(x => x.Name == model.targetColumn);
@@ -681,11 +676,11 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            foreach (string s in table.columns.GetUniqueConstrainst(true)) //constraint name control for all tables in application
+            foreach (string s in table.columns.GetUniqueConstrainst()) //constraint name control in table
             {
-                if (s == "UN_" + appName + "_" + uniqueName)
+                if (s == "UN_" + appName + "_" + tableName + "_" + uniqueName)
                 {
-                    TempData["message-error"] = "Unique constraint with name UN_" + uniqueName + " is already exist.";
+                    TempData["message-error"] = "Unique constraint with name " + s + " is already exist.";
                     return RedirectToAction("Index", new { @appName = appName });
                 }
             }
@@ -801,15 +796,12 @@ namespace FSPOC2.Controllers
                 ConnectionString = (new Entities()).Database.Connection.ConnectionString
             };
             DBTable table = app.GetTable(tableName);
-            foreach (DBTable t in app.GetTables())
+            foreach (string checkConstraint in table.GetCheckConstraints()) //constraint name control in table
             {
-                foreach (string checkConstraint in t.GetCheckConstraints()) //constraint name control for all tables in application
+                if (checkConstraint == "CHK_" + appName + "_" + tableName + "_" + fc["checkName"])
                 {
-                    if (checkConstraint == "CHK_" + appName + "_" + fc["checkName"])
-                    {
-                        TempData["message-error"] = "Check constraint with name " + checkConstraint + " is already exist.";
-                        return RedirectToAction("Index", new { @appName = appName });
-                    }
+                    TempData["message-error"] = "Check constraint with name " + checkConstraint + " is already exist.";
+                    return RedirectToAction("Index", new { @appName = appName });
                 }
             }
 
