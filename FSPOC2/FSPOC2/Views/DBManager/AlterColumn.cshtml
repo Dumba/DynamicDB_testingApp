@@ -13,6 +13,7 @@
 <h2>AlterColumn</h2>
 @using (Html.BeginForm("AlterColumn", "DBManager", new { appName = Request["appName"], tableName = Request["tableName"] }))
 {
+    @Html.HiddenFor(m=>m.ColumnId, Model.ColumnId)
     <table>
         <tr>
             <th>Name:</th>
